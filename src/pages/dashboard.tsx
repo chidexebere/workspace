@@ -1,37 +1,39 @@
 import { useEffect, useState } from 'react';
-import { db } from '../firebase/firebase.config';
-import { collection, DocumentData, getDocs } from 'firebase/firestore';
+import { DocumentData } from 'firebase/firestore';
 import Layout from '../layout';
-// import { boardObject } from '../utils/types';
+import { getItems } from '../utils/api';
+import BoardList from '../components/BoardList';
+import { useQuery } from 'react-query';
+
+// type Character = {
+//   name: string;
+// };
 
 const Dashboard = () => {
-  const [blogs, setBlogs] = useState<DocumentData[]>([]);
+  // const [boards, setBoards] = useState<DocumentData[]>([]);
+  //const item = 'boards'
+  // const fetchItems = getItems(item)
 
-  const getDashboard = async () => {
-    const querySnapshot = await getDocs(collection(db, 'boards'));
-    const documents: DocumentData[] = [];
-    querySnapshot.forEach((doc) => {
-      documents.push({ id: doc.id, ...doc.data() });
-    });
-    setBlogs(documents);
-  };
-
-  console.log(blogs);
-
-  useEffect(() => {
-    getDashboard();
-  }, []);
-
-  return (
-    <Layout>
-      {/* {error && <div>{error}</div>}
-      {isLoading && <div>Loading...</div>}
-      {!isLoading && error === null && boardList && (
-        <BoardList boards={boardList} />
-      )} */}
-      <h1> hello</h1>
-    </Layout>
+  const { isLoading, error, data } = useQuery<DocumentData[], Error>(
+    ['boards'],
+    getItems,
   );
+
+  console.log(data);
+
+  // useEffect(() => {
+  //   getItems('boards');
+  //   setBoards(boards);
+  // }, []);
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return <Layout>{data && <BoardList boards={data} />}</Layout>;
 };
 
 export default Dashboard;
