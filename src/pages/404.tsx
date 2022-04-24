@@ -1,0 +1,11 @@
+import Layout from '../layout';
+
+const NotFound = () => {
+  return (
+    <Layout>
+      <h1>Page not found</h1>
+    </Layout>
+  );
+};
+
+export default NotFound;
