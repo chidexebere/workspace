@@ -1,0 +1,128 @@
+import { Link } from 'react-router-dom';
+import { DragDropContext } from 'react-beautiful-dnd';
+// import {
+//   dragCardsBetweenList,
+//   dragCardsInSameList,
+//   getLists,
+// } from '../state/actions';
+import Breadcrumb from './Breadcrumb';
+import { CreateList } from './Create';
+import { List } from './List';
+import {
+  collection,
+  DocumentData,
+  getDocs,
+  query,
+  where,
+} from 'firebase/firestore';
+import { db } from '../firebase/firebase.config';
+import { useQuery } from 'react-query';
+
+interface Props {
+  boardId: string;
+  boardTitle: string;
+  boardBgColor: string;
+}
+const BoardContent = ({ boardId, boardTitle, boardBgColor }: Props) => {
+  const getListsPerBoard = async () => {
+    const q = query(collection(db, 'lists'), where('boardId', '==', boardId));
+    const querySnapshot = await getDocs(q);
+    const documents: DocumentData[] = [];
+    querySnapshot.forEach((doc) => {
+      documents.push({ id: doc.id, ...doc.data() });
+    });
+    return documents;
+  };
+  const { data: listsPerBoard } = useQuery<DocumentData[], Error>(
+    ['lists'],
+    getListsPerBoard,
+  );
+
+  const getCardsPerBoard = async () => {
+    const q = query(collection(db, 'cards'), where('boardId', '==', boardId));
+    const querySnapshot = await getDocs(q);
+    const documents: DocumentData[] = [];
+    querySnapshot.forEach((doc) => {
+      documents.push({ id: doc.id, ...doc.data() });
+    });
+    return documents;
+  };
+  const { data: cardsPerBoard } = useQuery<DocumentData[], Error>(
+    ['cards'],
+    getCardsPerBoard,
+  );
+
+  console.log(cardsPerBoard);
+
+  const handleOnDragEnd = (result: any) => {
+    const { destination, source, draggableId } = result;
+    console.log(result);
+
+    if (!destination) {
+      return;
+    }
+
+    if (source.droppableId === destination.droppableId) {
+      const cardsCopy = cardsPerBoard?.slice();
+      const [removed] = cardsCopy!.splice(source.index, 1);
+      cardsCopy?.splice(destination.index, 0, removed);
+
+      // dispatch(dragCardsInSameList(cardsCopy));
+    }
+
+    if (source.droppableId !== destination.droppableId) {
+      const cardsCopy = cardsPerBoard?.slice();
+      cardsCopy?.splice(source.index, 1);
+
+      const destinationDroppableId = Number(destination.droppableId);
+
+      // dispatch(
+      //   dragCardsBetweenList(
+      //     cardsCopy,
+      //     draggableId,
+      //     destinationDroppableId,
+      //     destination.index,
+      //   ),
+      // );
+    }
+  };
+
+  // useEffect(() => {
+  //   dispatch(getLists(boardId));
+  // }, []);
+
+  return (
+    <>
+      <Breadcrumb>
+        <li className="hover:text-gray-500">
+          <Link to={`/boards`}>Dashboard</Link>
+        </li>
+        <li>
+          <span className="text-gray-500 mx-2">/</span>
+        </li>
+        <li className="text-gray-600">{boardTitle}</li>
+      </Breadcrumb>
+      <DragDropContext onDragEnd={handleOnDragEnd}>
+        {listsPerBoard && (
+          <div className="mt-10 grid grid-flow-col overflow-x-auto h-full items-start auto-cols-220 gap-x-2 md:auto-cols-270 md:gap-x-4">
+            {listsPerBoard.map((list) => (
+              <div key={`${list.id}`}>
+                <List
+                  title={list.title}
+                  listId={list.id}
+                  boardId={boardId}
+                  bgColor={boardBgColor}
+                  cards={cardsPerBoard}
+                />
+              </div>
+            ))}
+
+            <CreateList boardId={boardId} />
+          </div>
+        )}
+      </DragDropContext>
+    </>
+  );
+};
+
+export default BoardContent;
