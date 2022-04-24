@@ -1,5 +1,3 @@
-export type boardObject = {
+export type Params = {
   id: string;
-  title: string;
-  bgColor: string;
 };
