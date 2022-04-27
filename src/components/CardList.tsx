@@ -1,13 +1,15 @@
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { DocumentData } from 'firebase/firestore';
 import { Card, CardContainer } from './Card';
+import { Dispatch, SetStateAction } from 'react';
 
 interface CardListProps {
   listId: string;
-  cards: DocumentData[] | undefined;
+  cards: DocumentData[];
+  setCards: Dispatch<SetStateAction<DocumentData[]>>;
 }
 
-const CardList = ({ listId, cards }: CardListProps) => {
+const CardList = ({ listId, cards, setCards }: CardListProps) => {
   const cardsByListId = cards?.filter((card) => card.listId === listId);
 
   return (
@@ -27,6 +29,8 @@ const CardList = ({ listId, cards }: CardListProps) => {
                       textContent={card.textContent}
                       cardId={card.id}
                       listId={listId}
+                      cards={cardsByListId}
+                      setCards={setCards}
                     />
                   </div>
                 )}

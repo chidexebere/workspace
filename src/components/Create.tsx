@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { XIcon } from '@heroicons/react/outline';
 import Button from './Button';
 import { AddList, EditListHeader } from './List';
@@ -9,8 +9,14 @@ import { AddBoard, EditBoard } from './Board';
 import Modal from './Modal';
 import { addBoard, addCard, addList } from '../utils/api';
 import { AddCard, AddCardForm } from './Card';
+import { DocumentData } from 'firebase/firestore';
 
-const CreateBoard = () => {
+interface CreateBoardProps {
+  boards: DocumentData[];
+  setBoardList: Dispatch<SetStateAction<DocumentData[]>>;
+}
+
+const CreateBoard = ({ boards, setBoardList }: CreateBoardProps) => {
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState('');
   const [bgColor, setBgColor] = useState('');
@@ -42,7 +48,9 @@ const CreateBoard = () => {
   ) => {
     e.preventDefault();
     if (title && bgColor) {
+      const newBoard = { title, bgColor };
       addBoard(title, bgColor);
+      setBoardList([...boards, newBoard]);
     }
     setTitle('');
     setBgColor('');
@@ -70,8 +78,10 @@ const CreateBoard = () => {
 
 interface CreateListProps {
   boardId: string;
+  lists: DocumentData[];
+  setLists: Dispatch<SetStateAction<DocumentData[]>>;
 }
-const CreateList = ({ boardId }: CreateListProps) => {
+const CreateList = ({ boardId, lists, setLists }: CreateListProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
 
@@ -91,18 +101,16 @@ const CreateList = ({ boardId }: CreateListProps) => {
   ) => {
     e.preventDefault();
     if (title) {
+      const newList = { title, boardId };
       addList(title, boardId);
+      setLists([...lists, newList]);
     }
     setTitle('');
     toggleForm();
   };
 
   return isOpen ? (
-    <EditListHeader
-      title={title}
-      onChange={handleInputChange}
-      handleSubmit={handleAddList}
-    >
+    <EditListHeader title={title} onChange={handleInputChange}>
       <div className="flex gap-x-2 items-center mt-2">
         <Button
           handleClick={handleAddList}
@@ -125,8 +133,10 @@ const CreateList = ({ boardId }: CreateListProps) => {
 interface CreateCardProps {
   listId: string;
   boardId: string;
+  cards: DocumentData[];
+  setCards: Dispatch<SetStateAction<DocumentData[]>>;
 }
-const CreateCard = ({ listId, boardId }: CreateCardProps) => {
+const CreateCard = ({ listId, boardId, cards, setCards }: CreateCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [textContent, setTextContent] = useState('');
 
@@ -146,7 +156,9 @@ const CreateCard = ({ listId, boardId }: CreateCardProps) => {
   ) => {
     e.preventDefault();
     if (textContent) {
+      const newCard = { textContent, listId, boardId };
       addCard(textContent, listId, boardId);
+      setCards([...cards, newCard]);
     }
     setTextContent('');
     toggleForm();

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { PlusIcon } from '@heroicons/react/outline';
 import { CreateCard } from './Create';
 import { TrashIcon } from '@heroicons/react/solid';
@@ -22,7 +22,7 @@ interface EditListHeaderProps {
   title: string;
   children?: React.ReactNode;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSubmit: (
+  handleSubmit?: (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => void;
 }
@@ -34,7 +34,7 @@ const EditListHeader = ({
   handleSubmit,
 }: EditListHeaderProps) => {
   return (
-    <form className="mb-3" onSubmit={handleSubmit}>
+    <form className="mb-3" onSubmit={handleSubmit} onClick={handleSubmit}>
       <label htmlFor="formInput"></label>
       <input
         type="text"
@@ -130,9 +130,21 @@ interface ListProps {
   bgColor: string;
   listId: string;
   boardId: string;
-  cards: DocumentData[] | undefined;
+  lists: DocumentData[];
+  setLists: Dispatch<SetStateAction<DocumentData[]>>;
+  cards: DocumentData[];
+  setCards: Dispatch<SetStateAction<DocumentData[]>>;
 }
-const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
+const List = ({
+  title,
+  bgColor,
+  listId,
+  boardId,
+  lists,
+  setLists,
+  cards,
+  setCards,
+}: ListProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
   const [showModal, setShowModal] = useState(false);
@@ -168,8 +180,10 @@ const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
   const handleDeleteList = (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
+    const filteredlists = lists.filter((list) => list.id !== listId);
     e.preventDefault();
     deleteList(listId);
+    setLists(filteredlists);
     toggleModal();
   };
 
@@ -190,9 +204,14 @@ const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
         />
       )}
 
-      {<CardList listId={listId} cards={cards} />}
+      {<CardList listId={listId} cards={cards} setCards={setCards} />}
 
-      <CreateCard listId={listId} boardId={boardId} />
+      <CreateCard
+        listId={listId}
+        boardId={boardId}
+        cards={cards}
+        setCards={setCards}
+      />
 
       <Modal title="Delete List" isOpen={showModal} handleClick={toggleModal}>
         <DeleteList toggleModal={toggleModal} handleSubmit={handleDeleteList} />

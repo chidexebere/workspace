@@ -5,6 +5,9 @@ import {
   doc,
   DocumentData,
   getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
   updateDoc,
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase.config';
@@ -12,7 +15,8 @@ import { db } from '../firebase/firebase.config';
 // Boards
 
 export const getBoards = async () => {
-  const querySnapshot = await getDocs(collection(db, 'boards'));
+  const q = query(collection(db, 'boards'), orderBy('timestamp', 'asc'));
+  const querySnapshot = await getDocs(q);
   const documents: DocumentData[] = [];
   querySnapshot.forEach((doc) => {
     documents.push({ id: doc.id, ...doc.data() });
@@ -35,9 +39,9 @@ export const addBoard = async (title: string, bgColor: string) => {
     const docRef = await addDoc(collection(db, 'boards'), {
       title: title,
       bgColor: bgColor,
+      timestamp: serverTimestamp(),
     });
     console.log('Document written with ID: ', docRef.id);
-    // return docRef;
   } catch (e) {
     console.error('Error adding document: ', e);
   }
@@ -62,14 +66,14 @@ export const deleteBoard = async (boardId: string) => {
 
 // Lists
 
-export const getLists = async () => {
-  const querySnapshot = await getDocs(collection(db, 'lists'));
-  const documents: DocumentData[] = [];
-  querySnapshot.forEach((doc) => {
-    documents.push({ id: doc.id, ...doc.data() });
-  });
-  return documents;
-};
+// export const getLists = async () => {
+//   const querySnapshot = await getDocs(collection(db, 'lists'));
+//   const documents: DocumentData[] = [];
+//   querySnapshot.forEach((doc) => {
+//     documents.push({ id: doc.id, ...doc.data() });
+//   });
+//   return documents;
+// };
 
 export const addList = async (title: string, boardId: string) => {
   try {
@@ -88,9 +92,9 @@ export const editList = async (
   title: string,
   boardId: string,
 ) => {
-  const washingtonRef = doc(db, 'lists', listId);
+  const docRef = doc(db, 'lists', listId);
 
-  await updateDoc(washingtonRef, {
+  await updateDoc(docRef, {
     title: title,
     boardId: boardId,
   });
@@ -102,14 +106,14 @@ export const deleteList = async (listId: string) => {
 
 // Cards
 
-export const getCards = async () => {
-  const querySnapshot = await getDocs(collection(db, 'cards'));
-  const documents: DocumentData[] = [];
-  querySnapshot.forEach((doc) => {
-    documents.push({ id: doc.id, ...doc.data() });
-  });
-  return documents;
-};
+// export const getCards = async () => {
+//   const querySnapshot = await getDocs(collection(db, 'cards'));
+//   const documents: DocumentData[] = [];
+//   querySnapshot.forEach((doc) => {
+//     documents.push({ id: doc.id, ...doc.data() });
+//   });
+//   return documents;
+// };
 
 export const addCard = async (
   textContent: string,
@@ -134,9 +138,9 @@ export const editCard = async (
   listId: string,
   boardId: string,
 ) => {
-  const washingtonRef = doc(db, 'cards', cardId);
+  const docRef = doc(db, 'cards', cardId);
 
-  await updateDoc(washingtonRef, {
+  await updateDoc(docRef, {
     textContent: textContent,
     listId: listId,
     boardId: boardId,

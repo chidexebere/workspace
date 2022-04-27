@@ -27,7 +27,7 @@ const BoardDetails = () => {
     <Layout>
       {board && (
         <BoardContent
-          boardId={boardId}
+          boardId={board[0].id}
           boardTitle={board[0].title}
           boardBgColor={board[0].bgColor}
         />

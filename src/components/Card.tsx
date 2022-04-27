@@ -1,5 +1,6 @@
 import { PlusIcon } from '@heroicons/react/outline';
-import { useState } from 'react';
+import { DocumentData } from 'firebase/firestore';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { deleteCard, editCard } from '../utils/api';
 import { Params } from '../utils/types';
@@ -90,6 +91,8 @@ interface EditCardProps {
   toggleOpenCardModal: () => void;
   listId?: string;
   cardId: string;
+  cards: DocumentData[];
+  setCards: Dispatch<SetStateAction<DocumentData[]>>;
 }
 const EditCard = ({
   textContent,
@@ -97,11 +100,12 @@ const EditCard = ({
   handleSubmit,
   toggleOpenCardModal,
   cardId,
+  cards,
+  setCards,
 }: EditCardProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showShareLink, setShowShareLink] = useState(false);
 
-  // const dispatch = useDispatch();
   const { id } = useParams<Params>();
 
   const toggleDeleteModal = () => {
@@ -120,7 +124,9 @@ const EditCard = ({
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
+    const filteredCards = cards.filter((card) => card.id !== cardId);
     deleteCard(cardId);
+    setCards(filteredCards);
     toggleDeleteModal();
     toggleOpenCardModal();
   };
@@ -227,32 +233,44 @@ interface CardProps {
   textContent: string;
   cardId: string;
   listId: string;
+  cards: DocumentData[];
+  setCards: Dispatch<SetStateAction<DocumentData[]>>;
 }
-const Card = ({ textContent, cardId, listId }: CardProps) => {
+const Card = ({ textContent, cardId, listId, cards, setCards }: CardProps) => {
   const [showOpenCardModal, setShowOpenCardModal] = useState(false);
   const [newTextContent, setNewTextContent] = useState(textContent);
+  const [enteredTextContent, setEnteredTextContent] = useState('');
 
-  // const dispatch = useDispatch();
   const { id } = useParams<Params>();
   const boardId = id;
 
+  const resetEdit = () => {
+    setEnteredTextContent(newTextContent);
+  };
+
+  const closeEdit = () => {
+    setShowOpenCardModal(!showOpenCardModal);
+  };
+
   const toggleOpenCardModal = () => {
+    resetEdit();
     setShowOpenCardModal(!showOpenCardModal);
   };
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = e.target as HTMLTextAreaElement;
-    setNewTextContent(value);
+    setEnteredTextContent(value);
   };
 
   const handleEditCard = (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
-    if (newTextContent) {
-      editCard(cardId, newTextContent, listId, boardId);
+    if (enteredTextContent !== newTextContent) {
+      editCard(cardId, enteredTextContent, listId, boardId);
+      setNewTextContent(enteredTextContent);
     }
-    toggleOpenCardModal();
+    setShowOpenCardModal(false);
   };
 
   return (
@@ -260,15 +278,17 @@ const Card = ({ textContent, cardId, listId }: CardProps) => {
       <Modal
         title="Edit Ticket"
         isOpen={showOpenCardModal}
-        handleClick={toggleOpenCardModal}
+        handleClick={closeEdit}
       >
         <EditCard
-          textContent={newTextContent}
+          textContent={enteredTextContent}
           onChange={handleTextAreaChange}
-          toggleOpenCardModal={toggleOpenCardModal}
+          toggleOpenCardModal={closeEdit}
           handleSubmit={handleEditCard}
           listId={listId}
           cardId={cardId}
+          cards={cards}
+          setCards={setCards}
         />
       </Modal>
 

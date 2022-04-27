@@ -1,10 +1,11 @@
 import { inputClass } from './List';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Button from './Button';
 import { CheckIcon, TrashIcon, PencilIcon } from '@heroicons/react/solid';
 import Modal from './Modal';
 import { deleteBoard, editBoard } from '../utils/api';
+import { DocumentData } from 'firebase/firestore';
 
 interface BoardCoverProps {
   bgColor: string;
@@ -157,13 +158,29 @@ interface BoardProps {
   bgColor: string;
   titleTextColor: string;
   boardId: string;
+  boards: DocumentData[];
+  setBoardList: Dispatch<SetStateAction<DocumentData[]>>;
 }
 
-const Board = ({ bgColor, title, titleTextColor, boardId }: BoardProps) => {
+const Board = ({
+  bgColor,
+  title,
+  titleTextColor,
+  boardId,
+  boards,
+  setBoardList,
+}: BoardProps) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
   const [newBgColor, setNewBgColor] = useState(bgColor);
+  const [inputTitle, setInputTitle] = useState('');
+  const [selectedBgColor, setSelectedBgColor] = useState('');
+
+  const resetEdit = () => {
+    setInputTitle(newTitle);
+    setSelectedBgColor(newBgColor);
+  };
 
   const toggleEditModal = () => {
     setShowEditModal(!showEditModal);
@@ -175,6 +192,7 @@ const Board = ({ bgColor, title, titleTextColor, boardId }: BoardProps) => {
 
   const openEditModal = (e: React.MouseEvent) => {
     e.stopPropagation();
+    resetEdit();
     toggleEditModal();
   };
 
@@ -192,29 +210,41 @@ const Board = ({ bgColor, title, titleTextColor, boardId }: BoardProps) => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target as HTMLInputElement;
-    setNewTitle(value);
+    setInputTitle(value);
   };
 
   const handleBgColorSelection = (e: React.MouseEvent<HTMLButtonElement>) => {
     const { value } = e.target as HTMLButtonElement;
-    setNewBgColor(value);
+    setSelectedBgColor(value);
   };
 
   const handleEditBoard = (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
-    if (newTitle || newBgColor) {
-      editBoard(boardId, newTitle, newBgColor);
+    if (inputTitle !== newTitle) {
+      editBoard(boardId, inputTitle, newBgColor);
+      setNewTitle(inputTitle);
     }
-    toggleEditModal();
+    if (selectedBgColor !== newBgColor) {
+      editBoard(boardId, newTitle, selectedBgColor);
+      setNewBgColor(selectedBgColor);
+    }
+    if (inputTitle !== newTitle && selectedBgColor !== newBgColor) {
+      editBoard(boardId, inputTitle, selectedBgColor);
+      setNewTitle(inputTitle);
+      setNewBgColor(selectedBgColor);
+    }
+    setShowEditModal(false);
   };
 
   const handleDeleteBoard = (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
+    const filteredBoards = boards.filter((board) => board.id !== boardId);
     deleteBoard(boardId);
+    setBoardList(filteredBoards);
     toggleDeleteModal();
   };
 
@@ -231,8 +261,8 @@ const Board = ({ bgColor, title, titleTextColor, boardId }: BoardProps) => {
         handleClick={toggleEditModal}
       >
         <EditBoard
-          title={newTitle}
-          bgColor={newBgColor}
+          title={inputTitle}
+          bgColor={selectedBgColor}
           backgroundColors={backgroundColors}
           onChange={handleInputChange}
           handleBgColorSelection={handleBgColorSelection}
