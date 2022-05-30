@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { PlusIcon } from '@heroicons/react/outline';
-import { CreateCard } from './Create';
+import { CreateCard } from '../Create';
 import { TrashIcon } from '@heroicons/react/solid';
-import Button from './Button';
-import Modal from './Modal';
-import CardList from './CardList';
+import Button from '../Button';
+import Modal from '../Modal';
+import CardList from '../Card/CardList';
 import { DocumentData } from 'firebase/firestore';
-import { useDeleteList, useEditList } from '../api/hooks';
+import { useDeleteList, useEditList } from '../../api/hooks';
 
 interface ListContainerProps {
   children: React.ReactNode;

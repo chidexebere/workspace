@@ -1,5 +1,5 @@
 import Layout from '../layout';
-import BoardList from '../components/BoardList';
+import BoardList from '../components/Board/BoardList';
 import { useBoards } from '../api/hooks';
 
 const Dashboard = () => {

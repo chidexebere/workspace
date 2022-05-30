@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useCachedBoards } from '../api/hooks';
-import BoardContent from '../components/BoardContent';
+import BoardContent from '../components/Board/BoardContent';
 import Layout from '../layout';
 
 const BoardDetails = () => {

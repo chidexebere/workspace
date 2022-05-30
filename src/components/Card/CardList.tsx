@@ -1,6 +1,6 @@
 import { Draggable, Droppable } from 'react-beautiful-dnd';
 import { DocumentData } from 'firebase/firestore';
-import { Card, CardContainer } from './Card';
+import { Card, CardContainer } from '.';
 
 interface CardListProps {
   listId: string;

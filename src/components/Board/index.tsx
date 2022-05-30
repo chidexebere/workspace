@@ -1,10 +1,10 @@
-import { inputClass } from './List';
+import { inputClass } from '../List';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from './Button';
+import Button from '../Button';
 import { CheckIcon, TrashIcon, PencilIcon } from '@heroicons/react/solid';
-import Modal from './Modal';
-import { useDeleteBoard, useEditBoard } from '../api/hooks';
+import Modal from '../Modal';
+import { useDeleteBoard, useEditBoard } from '../../api/hooks';
 
 interface BoardCoverProps {
   bgColor: string;

@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDeleteCard, useEditCard } from '../api/hooks';
-import Button from './Button';
-import { inputClass } from './List';
-import Modal from './Modal';
+import { useDeleteCard, useEditCard } from '../../api/hooks';
+import Button from '../Button';
+import { inputClass } from '../List';
+import Modal from '../Modal';
 import { PlusIcon } from '@heroicons/react/outline';
 
 const defaultCardClass = `form-control block w-full m-0 px-3 py-1.5 text-sm font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out

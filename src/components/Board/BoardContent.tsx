@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { DragDropContext } from 'react-beautiful-dnd';
-import Breadcrumb from './Breadcrumb';
-import { CreateList } from './Create';
-import { List } from './List';
-import { useCardsPerBoard, useListsPerBoard } from '../api/hooks';
+import Breadcrumb from '../Breadcrumb';
+import { CreateList } from '../Create';
+import { List } from '../List';
+import { useCardsPerBoard, useListsPerBoard } from '../../api/hooks';
 
 interface Props {
   boardId: string;

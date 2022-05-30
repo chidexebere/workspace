@@ -1,7 +1,7 @@
 import { DocumentData } from 'firebase/firestore';
-import { Board } from './Board';
-import Breadcrumb from './Breadcrumb';
-import { CreateBoard } from './Create';
+import { Board } from '.';
+import Breadcrumb from '../Breadcrumb';
+import { CreateBoard } from '../Create';
 
 interface Props {
   boards: DocumentData[];
