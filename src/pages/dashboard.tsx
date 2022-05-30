@@ -1,17 +1,12 @@
-import { DocumentData } from 'firebase/firestore';
 import Layout from '../layout';
-import { getBoards } from '../utils/api';
 import BoardList from '../components/BoardList';
-import { useQuery } from 'react-query';
+import { useBoards } from '../api/hooks';
 
 const Dashboard = () => {
-  const { isLoading, error, data } = useQuery<DocumentData[], Error>(
-    ['boards'],
-    getBoards,
-  );
+  const { isLoading, isError, data } = useBoards();
 
-  if (error) {
-    return <div>{error}</div>;
+  if (isError) {
+    return <div>An error occured</div>;
   }
 
   if (isLoading) {

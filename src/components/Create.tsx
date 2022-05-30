@@ -1,26 +1,18 @@
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { XIcon } from '@heroicons/react/outline';
 import Button from './Button';
 import { AddList, EditListHeader } from './List';
-// import { useDispatch } from 'react-redux';
-// import { addBoard, addCard, addList } from '../state/actions';
-// import { AddCard, AddCardForm } from './Card';
 import { AddBoard, EditBoard } from './Board';
 import Modal from './Modal';
-import { addBoard, addCard, addList } from '../utils/api';
 import { AddCard, AddCardForm } from './Card';
-import { DocumentData } from 'firebase/firestore';
+import { useAddBoard, useAddCard, useAddList } from '../api/hooks';
 
-interface CreateBoardProps {
-  boards: DocumentData[];
-  setBoardList: Dispatch<SetStateAction<DocumentData[]>>;
-}
-
-const CreateBoard = ({ boards, setBoardList }: CreateBoardProps) => {
+const CreateBoard = () => {
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState('');
   const [bgColor, setBgColor] = useState('');
-  // const dispatch = useDispatch();
+
+  const addNewBoard = useAddBoard();
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -49,8 +41,7 @@ const CreateBoard = ({ boards, setBoardList }: CreateBoardProps) => {
     e.preventDefault();
     if (title && bgColor) {
       const newBoard = { title, bgColor };
-      addBoard(title, bgColor);
-      setBoardList([...boards, newBoard]);
+      addNewBoard.mutate(newBoard);
     }
     setTitle('');
     setBgColor('');
@@ -78,14 +69,12 @@ const CreateBoard = ({ boards, setBoardList }: CreateBoardProps) => {
 
 interface CreateListProps {
   boardId: string;
-  lists: DocumentData[];
-  setLists: Dispatch<SetStateAction<DocumentData[]>>;
 }
-const CreateList = ({ boardId, lists, setLists }: CreateListProps) => {
+const CreateList = ({ boardId }: CreateListProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
 
-  // const dispatch = useDispatch();
+  const addNewList = useAddList();
 
   const toggleForm = () => {
     setIsOpen(!isOpen);
@@ -102,8 +91,7 @@ const CreateList = ({ boardId, lists, setLists }: CreateListProps) => {
     e.preventDefault();
     if (title) {
       const newList = { title, boardId };
-      addList(title, boardId);
-      setLists([...lists, newList]);
+      addNewList.mutate(newList);
     }
     setTitle('');
     toggleForm();
@@ -133,14 +121,12 @@ const CreateList = ({ boardId, lists, setLists }: CreateListProps) => {
 interface CreateCardProps {
   listId: string;
   boardId: string;
-  cards: DocumentData[];
-  setCards: Dispatch<SetStateAction<DocumentData[]>>;
 }
-const CreateCard = ({ listId, boardId, cards, setCards }: CreateCardProps) => {
+const CreateCard = ({ listId, boardId }: CreateCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [textContent, setTextContent] = useState('');
 
-  // const dispatch = useDispatch();
+  const addCard = useAddCard();
 
   const toggleForm = () => {
     setIsOpen(!isOpen);
@@ -157,8 +143,7 @@ const CreateCard = ({ listId, boardId, cards, setCards }: CreateCardProps) => {
     e.preventDefault();
     if (textContent) {
       const newCard = { textContent, listId, boardId };
-      addCard(textContent, listId, boardId);
-      setCards([...cards, newCard]);
+      addCard.mutate(newCard);
     }
     setTextContent('');
     toggleForm();

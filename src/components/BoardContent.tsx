@@ -1,22 +1,9 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DragDropContext } from 'react-beautiful-dnd';
-// import {
-//   dragCardsBetweenList,
-//   dragCardsInSameList,
-//   getLists,
-// } from '../state/actions';
 import Breadcrumb from './Breadcrumb';
 import { CreateList } from './Create';
 import { List } from './List';
-import {
-  collection,
-  DocumentData,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore';
-import { db } from '../firebase/firebase.config';
+import { useCardsPerBoard, useListsPerBoard } from '../api/hooks';
 
 interface Props {
   boardId: string;
@@ -24,43 +11,14 @@ interface Props {
   boardBgColor: string;
 }
 const BoardContent = ({ boardId, boardTitle, boardBgColor }: Props) => {
-  const [lists, setLists] = useState<DocumentData[]>([]);
-  const [cards, setCards] = useState<DocumentData[]>([]);
-  const getListsPerBoard = async () => {
-    const q = query(collection(db, 'lists'), where('boardId', '==', boardId));
-    const querySnapshot = await getDocs(q);
-    const documents: DocumentData[] = [];
-    querySnapshot.forEach((doc) => {
-      documents.push({ id: doc.id, ...doc.data() });
-    });
-    setLists(documents);
-  };
-  // const { data: listsPerBoard } = useQuery<DocumentData[], Error>(
-  //   ['lists'],
-  //   getListsPerBoard,
-  // );
-  // setLists(listsPerBoard);
+  const { isLoading, data: lists } = useListsPerBoard(boardId);
+  // console.log(lists);
 
-  const getCardsPerBoard = async () => {
-    const q = query(collection(db, 'cards'), where('boardId', '==', boardId));
-    const querySnapshot = await getDocs(q);
-    const documents: DocumentData[] = [];
-    querySnapshot.forEach((doc) => {
-      documents.push({ id: doc.id, ...doc.data() });
-    });
-    setCards(documents);
-  };
-  // const { data: cardsPerBoard } = useQuery<DocumentData[], Error>(
-  //   ['cards'],
-  //   getCardsPerBoard,
-  // );
-  // setCards(cardsPerBoard);
-  // console.log(cardsPerBoard);
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
-  useEffect(() => {
-    getListsPerBoard();
-    getCardsPerBoard();
-  }, []);
+  const { data: cards } = useCardsPerBoard(boardId);
 
   const handleOnDragEnd = (result: any) => {
     const { destination, source, draggableId } = result;
@@ -71,19 +29,16 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor }: Props) => {
     }
 
     if (source.droppableId === destination.droppableId) {
-      const cardsCopy = cards.slice();
-      const [removed] = cardsCopy.splice(source.index, 1);
-      cardsCopy?.splice(destination.index, 0, removed);
-
+      // const cardsCopy = cards.slice();
+      // const [removed] = cardsCopy.splice(source.index, 1);
+      // cardsCopy?.splice(destination.index, 0, removed);
       // dispatch(dragCardsInSameList(cardsCopy));
     }
 
     if (source.droppableId !== destination.droppableId) {
-      const cardsCopy = cards.slice();
-      cardsCopy.splice(source.index, 1);
-
-      const destinationDroppableId = Number(destination.droppableId);
-
+      // const cardsCopy = cards.slice();
+      // cardsCopy.splice(source.index, 1);
+      // const destinationDroppableId = Number(destination.droppableId);
       // dispatch(
       //   dragCardsBetweenList(
       //     cardsCopy,
@@ -94,10 +49,6 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor }: Props) => {
       // );
     }
   };
-
-  // useEffect(() => {
-  //   dispatch(getLists(boardId));
-  // }, []);
 
   return (
     <>
@@ -121,14 +72,11 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor }: Props) => {
                   boardId={boardId}
                   bgColor={boardBgColor}
                   lists={lists}
-                  setLists={setLists}
                   cards={cards}
-                  setCards={setCards}
                 />
               </div>
             ))}
-
-            <CreateList boardId={boardId} lists={lists} setLists={setLists} />
+            <CreateList boardId={boardId} />
           </div>
         )}
       </DragDropContext>

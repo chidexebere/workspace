@@ -9,6 +9,7 @@ import {
   query,
   serverTimestamp,
   updateDoc,
+  where,
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase.config';
 
@@ -24,16 +25,6 @@ export const getBoards = async () => {
   return documents;
 };
 
-// export const getBoardById = async (id: string) => {
-//   const q = query(collection(db, 'boards'), where('boardId', '==', `${id}`));
-//   const querySnapshot = await getDocs(q);
-//   const documents: DocumentData[] = [];
-//   querySnapshot.forEach((doc) => {
-//     documents.push({ id: doc.id, ...doc.data() });
-//   });
-//   return documents;
-// };
-
 export const addBoard = async (title: string, bgColor: string) => {
   try {
     const docRef = await addDoc(collection(db, 'boards'), {
@@ -41,9 +32,9 @@ export const addBoard = async (title: string, bgColor: string) => {
       bgColor: bgColor,
       timestamp: serverTimestamp(),
     });
-    console.log('Document written with ID: ', docRef.id);
+    console.log('Board created with ID: ', docRef.id);
   } catch (e) {
-    console.error('Error adding document: ', e);
+    console.error('Error creating board: ', e);
   }
 };
 
@@ -66,24 +57,30 @@ export const deleteBoard = async (boardId: string) => {
 
 // Lists
 
-// export const getLists = async () => {
-//   const querySnapshot = await getDocs(collection(db, 'lists'));
-//   const documents: DocumentData[] = [];
-//   querySnapshot.forEach((doc) => {
-//     documents.push({ id: doc.id, ...doc.data() });
-//   });
-//   return documents;
-// };
+export const getListsPerBoard = async (id: string) => {
+  const q = query(
+    collection(db, 'lists'),
+    where('boardId', '==', `${id}`),
+    orderBy('timestamp', 'asc'),
+  );
+  const querySnapshot = await getDocs(q);
+  const documents: DocumentData[] = [];
+  querySnapshot.forEach((doc) => {
+    documents.push({ id: doc.id, ...doc.data() });
+  });
+  return documents;
+};
 
 export const addList = async (title: string, boardId: string) => {
   try {
     const docRef = await addDoc(collection(db, 'lists'), {
       title: title,
       boardId: boardId,
+      timestamp: serverTimestamp(),
     });
-    console.log('Document written with ID: ', docRef.id);
+    console.log('List created with ID: ', docRef.id);
   } catch (e) {
-    console.error('Error adding document: ', e);
+    console.error('Error creating list: ', e);
   }
 };
 
@@ -106,14 +103,19 @@ export const deleteList = async (listId: string) => {
 
 // Cards
 
-// export const getCards = async () => {
-//   const querySnapshot = await getDocs(collection(db, 'cards'));
-//   const documents: DocumentData[] = [];
-//   querySnapshot.forEach((doc) => {
-//     documents.push({ id: doc.id, ...doc.data() });
-//   });
-//   return documents;
-// };
+export const getCardsPerBoard = async (id: string) => {
+  const q = query(
+    collection(db, 'cards'),
+    where('boardId', '==', `${id}`),
+    orderBy('timestamp', 'asc'),
+  );
+  const querySnapshot = await getDocs(q);
+  const documents: DocumentData[] = [];
+  querySnapshot.forEach((doc) => {
+    documents.push({ id: doc.id, ...doc.data() });
+  });
+  return documents;
+};
 
 export const addCard = async (
   textContent: string,
@@ -125,10 +127,11 @@ export const addCard = async (
       textContent: textContent,
       listId: listId,
       boardId: boardId,
+      timestamp: serverTimestamp(),
     });
-    console.log('Document written with ID: ', docRef.id);
+    console.log('Card created with ID: ', docRef.id);
   } catch (e) {
-    console.error('Error adding document: ', e);
+    console.error('Error creating card: ', e);
   }
 };
 

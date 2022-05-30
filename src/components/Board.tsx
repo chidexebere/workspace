@@ -1,11 +1,10 @@
 import { inputClass } from './List';
-import { Dispatch, SetStateAction, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 import { CheckIcon, TrashIcon, PencilIcon } from '@heroicons/react/solid';
 import Modal from './Modal';
-import { deleteBoard, editBoard } from '../utils/api';
-import { DocumentData } from 'firebase/firestore';
+import { useDeleteBoard, useEditBoard } from '../api/hooks';
 
 interface BoardCoverProps {
   bgColor: string;
@@ -158,24 +157,18 @@ interface BoardProps {
   bgColor: string;
   titleTextColor: string;
   boardId: string;
-  boards: DocumentData[];
-  setBoardList: Dispatch<SetStateAction<DocumentData[]>>;
 }
 
-const Board = ({
-  bgColor,
-  title,
-  titleTextColor,
-  boardId,
-  boards,
-  setBoardList,
-}: BoardProps) => {
+const Board = ({ bgColor, title, titleTextColor, boardId }: BoardProps) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
   const [newBgColor, setNewBgColor] = useState(bgColor);
   const [inputTitle, setInputTitle] = useState('');
   const [selectedBgColor, setSelectedBgColor] = useState('');
+
+  const editBoard = useEditBoard();
+  const deleteBoard = useDeleteBoard();
 
   const resetEdit = () => {
     setInputTitle(newTitle);
@@ -223,15 +216,19 @@ const Board = ({
   ) => {
     e.preventDefault();
     if (inputTitle !== newTitle) {
-      editBoard(boardId, inputTitle, newBgColor);
+      editBoard.mutate({ boardId, title: inputTitle, bgColor: newBgColor });
       setNewTitle(inputTitle);
     }
     if (selectedBgColor !== newBgColor) {
-      editBoard(boardId, newTitle, selectedBgColor);
+      editBoard.mutate({ boardId, title: newTitle, bgColor: selectedBgColor });
       setNewBgColor(selectedBgColor);
     }
     if (inputTitle !== newTitle && selectedBgColor !== newBgColor) {
-      editBoard(boardId, inputTitle, selectedBgColor);
+      editBoard.mutate({
+        boardId,
+        title: inputTitle,
+        bgColor: selectedBgColor,
+      });
       setNewTitle(inputTitle);
       setNewBgColor(selectedBgColor);
     }
@@ -242,16 +239,14 @@ const Board = ({
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
-    const filteredBoards = boards.filter((board) => board.id !== boardId);
-    deleteBoard(boardId);
-    setBoardList(filteredBoards);
+    deleteBoard.mutate(boardId);
     toggleDeleteModal();
   };
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    history.push(`/boards/${boardId}`);
+    navigate(`/boards/${boardId}`);
   };
   return (
     <>

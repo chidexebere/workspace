@@ -1,15 +1,10 @@
-import { PlusIcon } from '@heroicons/react/outline';
-import { DocumentData } from 'firebase/firestore';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { deleteCard, editCard } from '../utils/api';
-import { Params } from '../utils/types';
-// import { useParams } from 'react-router-dom/cjs/react-router-dom.min';
-// import { useDispatch } from 'react-redux';
+import { useDeleteCard, useEditCard } from '../api/hooks';
 import Button from './Button';
 import { inputClass } from './List';
 import Modal from './Modal';
-// import { deleteCard, editCard } from '../state/actions';
+import { PlusIcon } from '@heroicons/react/outline';
 
 const defaultCardClass = `form-control block w-full m-0 px-3 py-1.5 text-sm font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out
 focus:text-gray-700 focus:bg-white focus:border-gray-700 focus:outline-none`;
@@ -91,8 +86,6 @@ interface EditCardProps {
   toggleOpenCardModal: () => void;
   listId?: string;
   cardId: string;
-  cards: DocumentData[];
-  setCards: Dispatch<SetStateAction<DocumentData[]>>;
 }
 const EditCard = ({
   textContent,
@@ -100,11 +93,11 @@ const EditCard = ({
   handleSubmit,
   toggleOpenCardModal,
   cardId,
-  cards,
-  setCards,
 }: EditCardProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showShareLink, setShowShareLink] = useState(false);
+
+  const deleteCard = useDeleteCard();
 
   const { id } = useParams<Params>();
 
@@ -124,9 +117,9 @@ const EditCard = ({
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
-    const filteredCards = cards.filter((card) => card.id !== cardId);
-    deleteCard(cardId);
-    setCards(filteredCards);
+    // const filteredCards = cards.filter((card) => card.id !== cardId);
+    deleteCard.mutate(cardId);
+    // setCards(filteredCards);
     toggleDeleteModal();
     toggleOpenCardModal();
   };
@@ -233,16 +226,15 @@ interface CardProps {
   textContent: string;
   cardId: string;
   listId: string;
-  cards: DocumentData[];
-  setCards: Dispatch<SetStateAction<DocumentData[]>>;
 }
-const Card = ({ textContent, cardId, listId, cards, setCards }: CardProps) => {
+const Card = ({ textContent, cardId, listId }: CardProps) => {
   const [showOpenCardModal, setShowOpenCardModal] = useState(false);
   const [newTextContent, setNewTextContent] = useState(textContent);
   const [enteredTextContent, setEnteredTextContent] = useState('');
 
-  const { id } = useParams<Params>();
-  const boardId = id;
+  const editCard = useEditCard();
+
+  const { id: boardId } = useParams() as { id: string };
 
   const resetEdit = () => {
     setEnteredTextContent(newTextContent);
@@ -267,7 +259,12 @@ const Card = ({ textContent, cardId, listId, cards, setCards }: CardProps) => {
   ) => {
     e.preventDefault();
     if (enteredTextContent !== newTextContent) {
-      editCard(cardId, enteredTextContent, listId, boardId);
+      editCard.mutate({
+        cardId,
+        textContent: enteredTextContent,
+        listId,
+        boardId,
+      });
       setNewTextContent(enteredTextContent);
     }
     setShowOpenCardModal(false);
@@ -287,8 +284,6 @@ const Card = ({ textContent, cardId, listId, cards, setCards }: CardProps) => {
           handleSubmit={handleEditCard}
           listId={listId}
           cardId={cardId}
-          cards={cards}
-          setCards={setCards}
         />
       </Modal>
 

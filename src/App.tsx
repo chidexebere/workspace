@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import NotFound from './pages/404';
 import BoardDetails from './pages/boardDetails';
 import Dashboard from './pages/dashboard';
@@ -8,20 +8,14 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Switch>
-          <Route exact path="/">
-            <Home />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="boards" element={<Dashboard />} />
+          <Route path="boards">
+            <Route path=":id" element={<BoardDetails />} />
           </Route>
-          <Route exact path="/boards">
-            <Dashboard />
-          </Route>
-          <Route path="/boards/:id">
-            <BoardDetails />
-          </Route>
-          <Route path="*">
-            <NotFound />
-          </Route>
-        </Switch>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </div>
     </Router>
   );

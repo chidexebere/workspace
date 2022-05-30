@@ -1,27 +1,13 @@
-import { DocumentData } from 'firebase/firestore';
-import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
+import { useCachedBoards } from '../api/hooks';
 import BoardContent from '../components/BoardContent';
 import Layout from '../layout';
-import { getBoards } from '../utils/api';
-import { Params } from '../utils/types';
 
 const BoardDetails = () => {
   const { id: boardId } = useParams<Params>();
 
-  const { isLoading, error, data } = useQuery<DocumentData[], Error>(
-    ['boards'],
-    getBoards,
-  );
-  const board = data?.filter((item) => item.id === boardId);
-
-  if (error) {
-    return <div>{error}</div>;
-  }
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const boardsData = useCachedBoards();
+  const board = boardsData?.filter((item) => item.id === boardId);
 
   return (
     <Layout>
