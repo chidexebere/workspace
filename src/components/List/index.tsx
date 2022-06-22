@@ -13,10 +13,10 @@ interface ListContainerProps {
 }
 
 const ListContainer = ({ children }: ListContainerProps) => {
-  return <div className="flex flex-col rounded bg-slate-100"> {children}</div>;
+  return <div className="rounded bg-slate-100"> {children}</div>;
 };
 
-const inputClass = `form-control block w-full px-3 py-1.5 text-base bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none font-medium`;
+const inputClass = `w-48 min-w-full px-3 py-1.5 text-base bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none font-medium`;
 
 interface EditListHeaderProps {
   title: string;
@@ -179,20 +179,22 @@ const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
 
   return (
     <ListContainer>
-      {isEditing ? (
-        <EditListHeader
-          title={newTitle}
-          onChange={handleInputChange}
-          handleSubmit={handleEditList}
-        />
-      ) : (
-        <ListHeader
-          title={newTitle}
-          bgColor={bgColor}
-          handleClick={handleEditing}
-          openModal={openDeleteModal}
-        />
-      )}
+      <div className="">
+        {isEditing ? (
+          <EditListHeader
+            title={newTitle}
+            onChange={handleInputChange}
+            handleSubmit={handleEditList}
+          />
+        ) : (
+          <ListHeader
+            title={newTitle}
+            bgColor={bgColor}
+            handleClick={handleEditing}
+            openModal={openDeleteModal}
+          />
+        )}
+      </div>
 
       {<CardList listId={listId} cards={cards} />}
 
