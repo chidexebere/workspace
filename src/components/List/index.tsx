@@ -164,7 +164,7 @@ const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
   ) => {
     e.preventDefault();
     if (newTitle) {
-      editList.mutate({ boardId, title: newTitle, listId });
+      editList.mutate({ title: newTitle, listId });
     }
     setIsEditing(false);
   };
