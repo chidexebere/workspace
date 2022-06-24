@@ -13,6 +13,8 @@ import {
   getBoards,
   getCardsPerBoard,
   getListsPerBoard,
+  dragCardsInSameList,
+  dragCardsBetweenList,
 } from '.';
 
 // Get boards
@@ -48,7 +50,6 @@ const useAddBoard = () => {
           queryClient.setQueryData<DocumentData[]>('boards', [
             ...previousBoards,
             {
-              id: Math.random().toString(),
               title: title,
               bgColor: bgColor,
             },
@@ -150,7 +151,7 @@ const useAddList = () => {
         if (previousLists) {
           queryClient.setQueryData<DocumentData[]>('lists', [
             ...previousLists,
-            { id: Math.random().toString(), title: title, boardId: boardId },
+            { title: title, boardId: boardId },
           ]);
         }
 
@@ -177,8 +178,8 @@ const useAddList = () => {
 const useEditList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ boardId, title, listId }: newListObject & { listId: string }) => {
-      return editList(boardId, title, listId);
+    ({ title, listId }: existingListObject) => {
+      return editList(title, listId);
     },
     {
       onSuccess: () => {
@@ -242,7 +243,7 @@ const useAddCard = () => {
         if (previousCards) {
           queryClient.setQueryData<DocumentData[]>('cards', [
             ...previousCards,
-            { id: Math.random().toString(), textContent, listId, boardId },
+            { textContent, listId, boardId },
           ]);
         }
 
@@ -286,7 +287,7 @@ const useEditCard = () => {
   );
 };
 
-// Delete List
+// Delete Card
 const useDeleteCard = () => {
   const queryClient = useQueryClient();
   return useMutation(
@@ -318,6 +319,63 @@ const useDeleteCard = () => {
   );
 };
 
+// Drag cards in the same list
+const useDragCardsInSameList = () => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    (cardsCopy: DocumentData[]) => {
+      return dragCardsInSameList(cardsCopy);
+    },
+    {
+      onMutate: async (cardsCopy) => {
+        await queryClient.cancelQueries('cards');
+
+        // Snapshot the previous value
+        const previousCards = queryClient.getQueryData<DocumentData[]>('cards');
+
+        // Optimistically update to the new value
+        if (previousCards) {
+          queryClient.setQueryData<DocumentData[]>('cards', [...cardsCopy]);
+        }
+        return { previousCards };
+      },
+      // Always refetch after error or success:
+      onSettled: () => {
+        queryClient.invalidateQueries('cards');
+      },
+    },
+  );
+};
+
+const useDragCardsBetweenList = () => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({ cardsCopy, cardId, listId }: dragBetweenObject) => {
+      return dragCardsBetweenList(cardsCopy, cardId, listId);
+    },
+    {
+      onMutate: async ({ cardsCopy, cardId, listId }: dragBetweenObject) => {
+        await queryClient.cancelQueries('cards');
+
+        // Snapshot the previous value
+        const previousCards = queryClient.getQueryData<DocumentData[]>('cards');
+        const cardCopyIndex = cardsCopy.findIndex((card) => card.id === cardId);
+        cardsCopy[cardCopyIndex].listId = listId;
+
+        // Optimistically update to the new value
+        if (previousCards) {
+          queryClient.setQueryData<DocumentData[]>('cards', [...cardsCopy]);
+        }
+        return { previousCards };
+      },
+      // Always refetch after error or success:
+      onSettled: () => {
+        queryClient.invalidateQueries('cards');
+      },
+    },
+  );
+};
+
 export {
   useBoards,
   useCachedBoards,
@@ -332,4 +390,6 @@ export {
   useAddCard,
   useEditCard,
   useDeleteCard,
+  useDragCardsInSameList,
+  useDragCardsBetweenList,
 };
