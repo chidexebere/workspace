@@ -3,7 +3,7 @@ import BoardList from '../components/Board/BoardList';
 import { useBoards } from '../api/hooks';
 
 const Dashboard = () => {
-  const { isLoading, isError, data } = useBoards();
+  const { isLoading, isError, data } = useBoards(true);
 
   if (isError) {
     return <div>An error occured</div>;

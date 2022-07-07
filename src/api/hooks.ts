@@ -18,8 +18,10 @@ import {
 } from '.';
 
 // Get boards
-const useBoards = () => {
-  return useQuery<DocumentData[], Error>('boards', getBoards);
+const useBoards = (isFetching: boolean) => {
+  return useQuery<DocumentData[], Error>('boards', getBoards, {
+    enabled: isFetching,
+  });
 };
 
 // Use cached board data

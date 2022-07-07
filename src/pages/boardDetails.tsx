@@ -1,21 +1,33 @@
 import { useParams } from 'react-router-dom';
-import { useCachedBoards } from '../api/hooks';
+import { useBoards, useCachedBoards, useListsPerBoard } from '../api/hooks';
 import BoardContent from '../components/Board/BoardContent';
 import Layout from '../layout';
 
 const BoardDetails = () => {
-  const { id: boardId } = useParams<Params>();
+  const cachedBoardsData = useCachedBoards();
+  const { data: boards } = useBoards(
+    cachedBoardsData === undefined ? true : false,
+  );
 
-  const boardsData = useCachedBoards();
+  const boardsData = cachedBoardsData === undefined ? boards : cachedBoardsData;
+
+  const { id: boardId } = useParams<Params>();
   const board = boardsData?.filter((item) => item.id === boardId);
+
+  const { isLoading, data: lists } = useListsPerBoard(boardId as string);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Layout>
-      {board && (
+      {board && lists && (
         <BoardContent
           boardId={board[0].id}
           boardTitle={board[0].title}
           boardBgColor={board[0].bgColor}
+          lists={lists}
         />
       )}
     </Layout>

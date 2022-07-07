@@ -5,28 +5,20 @@ import { CreateList } from '../Create';
 import { List } from '../List';
 import {
   useCardsPerBoard,
-  useListsPerBoard,
   useDragCardsInSameList,
   useDragCardsBetweenList,
 } from '../../api/hooks';
-// import { dragCardsInSameList } from '../../api';
+import { DocumentData } from 'firebase/firestore';
 
 interface Props {
   boardId: string;
   boardTitle: string;
   boardBgColor: string;
+  lists: DocumentData[];
 }
-const BoardContent = ({ boardId, boardTitle, boardBgColor }: Props) => {
-  const { isLoading, data: lists } = useListsPerBoard(boardId);
-  // console.log(lists);
-
-  // if (isLoading) {
-  //   return <div>Loading...</div>;
-  // }
-
+const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
   const { data: cards } = useCardsPerBoard(boardId);
 
-  // console.log(cards);
   const dragCardsInSameList = useDragCardsInSameList();
   const dragCardsBetweenList = useDragCardsBetweenList();
 
