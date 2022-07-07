@@ -70,13 +70,13 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
   return (
     <>
       <Breadcrumb>
-        <li className="hover:text-gray-500">
+        <li className="text-gray-600 hover:text-gray-800">
           <Link to={`/boards`}>Dashboard</Link>
         </li>
         <li>
           <span className="text-gray-500 mx-2">/</span>
         </li>
-        <li className="text-gray-600">{boardTitle}</li>
+        <li className="">{boardTitle}</li>
       </Breadcrumb>
       <DragDropContext onDragEnd={handleOnDragEnd}>
         {lists && (
