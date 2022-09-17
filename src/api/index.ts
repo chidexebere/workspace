@@ -1,13 +1,16 @@
 import {
+  addDoc,
   arrayRemove,
   arrayUnion,
   collection,
   deleteDoc,
   doc,
   DocumentData,
+  getDoc,
   getDocs,
   orderBy,
   query,
+  serverTimestamp,
   setDoc,
   updateDoc,
   where,
@@ -16,14 +19,21 @@ import { db } from '../firebase/firebase.config';
 import { v4 as uuidv4 } from 'uuid';
 
 // Helper functions
-const getItems = async (item: string) => {
-  const q = query(collection(db, item));
-  const querySnapshot = await getDocs(q);
-  const documents: DocumentData[] = [];
-  querySnapshot.forEach((doc) => {
-    documents.push(doc.data());
-  });
-  return documents;
+const getOrder = async (item: string, id: string) => {
+  const docRef = doc(db, item, id);
+  const docSnap = await getDoc(docRef);
+  let document: DocumentData = {};
+
+  if (docSnap.exists()) {
+    document = docSnap.data();
+  } else {
+    console.log('document not available');
+    document;
+  }
+  const empty: string[] = [];
+  const docOrder = empty.concat(document.order);
+
+  return docOrder;
 };
 
 const removeItem = async (
@@ -63,29 +73,30 @@ const addOrder = async (
 };
 
 const reOrderList = async () => {
-  const listsOrder = await getItems('listsOrder');
-  listsOrder?.[0].order.forEach(async (listsOrderId: string) => {
+  const listsOrder = await getOrder('listsOrder', 'lists-order-id');
+  listsOrder.forEach(async (listsOrderId: string) => {
     const docRef = doc(db, 'lists', listsOrderId);
     await updateDoc(docRef, {
-      listIndex: listsOrder?.[0].order.indexOf(listsOrderId),
+      listIndex: listsOrder.indexOf(listsOrderId),
     });
   });
 };
 
 const reOrderCard = async () => {
-  const cardsOrder = await getItems('cardsOrder');
-  console.log(cardsOrder?.[0].order);
-  cardsOrder?.[0].order.forEach(async (cardsOrderId: string) => {
+  const cardsOrder = await getOrder('cardsOrder', 'cards-order-id');
+
+  cardsOrder.forEach(async (cardsOrderId: string) => {
     const docRef = doc(db, 'cards', cardsOrderId);
     await updateDoc(docRef, {
-      cardIndex: cardsOrder?.[0].order.indexOf(cardsOrderId),
+      cardIndex: cardsOrder.indexOf(cardsOrderId),
     });
   });
 };
 
 // Boards
 export const getBoards = async () => {
-  const q = query(collection(db, 'boards'), orderBy('borderIndex', 'asc'));
+  const q = query(collection(db, 'boards'));
+  // const q = query(collection(db, 'boards'), orderBy('borderIndex', 'asc'));
   const querySnapshot = await getDocs(q);
   const documents: DocumentData[] = [];
   querySnapshot.forEach((doc) => {
@@ -94,21 +105,35 @@ export const getBoards = async () => {
   return documents;
 };
 
+// export const addBoard = async (title: string, bgColor: string) => {
+//   try {
+//     // Get ID
+//     const uid = uuidv4();
+//     // Add ID to boardsOrder collection
+//     await addOrder('boardsOrder', 'boards-order-id', uid);
+//     // Get boardsOrder collection
+//     const boardsOrder = await getOrder('boardsOrder', 'boards-order-id');
+
+//     // Create a new board adding index of created ID
+//     const docRef = doc(db, 'boards', uid);
+//     await setDoc(docRef, {
+//       title: title,
+//       bgColor: bgColor,
+//       borderIndex: boardsOrder.indexOf(uid),
+//     });
+//     console.log('Board created with ID: ', docRef.id);
+//   } catch (e) {
+//     console.error('Error creating board: ', e);
+//   }
+// };
+
 export const addBoard = async (title: string, bgColor: string) => {
   try {
-    // Get ID
-    const uid = uuidv4();
-    // Add ID to boardsOrder collection
-    await addOrder('boardsOrder', 'boards-order-id', uid);
-    // Get boardsOrder collection
-    const boardsOrder = await getItems('boardsOrder');
-
-    // Create a new board adding index of created ID
-    const docRef = doc(db, 'boards', uid);
-    await setDoc(docRef, {
+    // Add a new board with a generated id.
+    const docRef = await addDoc(collection(db, 'boards'), {
       title: title,
       bgColor: bgColor,
-      borderIndex: boardsOrder?.[0].order.indexOf(uid),
+      createdAt: serverTimestamp(),
     });
     console.log('Board created with ID: ', docRef.id);
   } catch (e) {
@@ -132,35 +157,30 @@ export const editBoard = async (
 export const deleteBoard = async (boardId: string) => {
   await deleteDoc(doc(db, 'boards', boardId));
 
-  // Remove boardId from boardsOrder collection
-  const docOrderRef = doc(db, 'boardsOrder', 'boards-order-id');
-  await updateDoc(docOrderRef, {
-    order: arrayRemove(boardId),
-  });
+  // // Remove boardId from boardsOrder collection
+  // const docOrderRef = doc(db, 'boardsOrder', 'boards-order-id');
+  // await updateDoc(docOrderRef, {
+  //   order: arrayRemove(boardId),
+  // });
 
-  const boardsOrder = await getItems('boardsOrder');
-  const order = boardsOrder?.[0].order;
-  order.forEach(async (boardsOrderId: string) => {
-    const docRef = doc(db, 'boards', boardsOrderId);
-    await updateDoc(docRef, {
-      borderIndex: order.indexOf(boardsOrderId),
-    });
-  });
+  // const boardsOrder = await getOrder('boardsOrder', 'boards-order-id');
+  // boardsOrder.forEach(async (boardsOrderId: string) => {
+  //   const docRef = doc(db, 'boards', boardsOrderId);
+  //   await updateDoc(docRef, {
+  //     borderIndex: boardsOrder.indexOf(boardsOrderId),
+  //   });
+  // });
 
-  await removeItem('lists', 'boardId', boardId, 'listsOrder', 'lists-order-id');
-  await reOrderList();
+  // await removeItem('lists', 'boardId', boardId, 'listsOrder', 'lists-order-id');
+  // await reOrderList();
 
-  await removeItem('cards', 'boardId', boardId, 'cardsOrder', 'cards-order-id');
-  await reOrderCard();
+  // await removeItem('cards', 'boardId', boardId, 'cardsOrder', 'cards-order-id');
+  // await reOrderCard();
 };
 
 // Lists
-export const getListsPerBoard = async (id: string) => {
-  const q = query(
-    collection(db, 'lists'),
-    where('boardId', '==', `${id}`),
-    orderBy('listIndex', 'asc'),
-  );
+export const getListsPerBoard = async (boardId: string) => {
+  const q = query(collection(db, `boards/${boardId}/lists`));
   const querySnapshot = await getDocs(q);
   const documents: DocumentData[] = [];
   querySnapshot.forEach((doc) => {
@@ -171,17 +191,11 @@ export const getListsPerBoard = async (id: string) => {
 
 export const addList = async (title: string, boardId: string) => {
   try {
-    // Get ID
-    const uid = uuidv4();
-    // Add ID to listsOrder collection
-    await addOrder('listsOrder', 'lists-order-id', uid);
-    // Get listsOrder collection
-    const listsOrder = await getItems('listsOrder');
-    const docRef = doc(db, 'lists', uid);
-    await setDoc(docRef, {
+    // Add a new list with a generated id.
+    const docRef = await addDoc(collection(db, `boards/${boardId}/lists`), {
       title: title,
-      boardId: boardId,
-      listIndex: listsOrder?.[0].order.indexOf(uid),
+      cards: [],
+      createdAt: serverTimestamp(),
     });
     console.log('List created with ID: ', docRef.id);
   } catch (e) {
@@ -189,44 +203,38 @@ export const addList = async (title: string, boardId: string) => {
   }
 };
 
-export const editList = async (title: string, listId: string) => {
-  const docRef = doc(db, 'lists', listId);
+export const editList = async (
+  title: string,
+  listId: string,
+  boardId: string,
+) => {
+  // const docRef = doc(db, 'lists', listId);
+
+  const docRef = doc(db, `boards/${boardId}/lists`, listId);
 
   await updateDoc(docRef, {
     title: title,
   });
 };
 
-export const deleteList = async (listId: string) => {
-  await deleteDoc(doc(db, 'lists', listId));
-
-  // Remove listId from listsOrder collection
-  const docOrderRef = doc(db, 'listsOrder', 'lists-order-id');
-  await updateDoc(docOrderRef, {
-    order: arrayRemove(listId),
-  });
-
-  await reOrderList();
-
-  // Remove all Cards under listId
-  await removeItem('cards', 'listId', listId, 'cardsOrder', 'cards-order-id');
-  await reOrderCard();
+export const deleteList = async (listId: string, boardId: string) => {
+  await deleteDoc(doc(db, `boards/${boardId}/lists`, listId));
 };
 
 // Cards
-export const getCardsPerBoard = async (id: string) => {
-  const q = query(
-    collection(db, 'cards'),
-    where('boardId', '==', `${id}`),
-    orderBy('cardIndex', 'asc'),
-  );
-  const querySnapshot = await getDocs(q);
-  const documents: DocumentData[] = [];
-  querySnapshot.forEach((doc) => {
-    documents.push({ id: doc.id, ...doc.data() });
-  });
-  return documents;
-};
+// export const getCardsPerBoard = async (id: string) => {
+//   const q = query(
+//     collection(db, 'cards'),
+//     where('boardId', '==', `${id}`),
+//     orderBy('cardIndex', 'asc'),
+//   );
+//   const querySnapshot = await getDocs(q);
+//   const documents: DocumentData[] = [];
+//   querySnapshot.forEach((doc) => {
+//     documents.push({ id: doc.id, ...doc.data() });
+//   });
+//   return documents;
+// };
 
 export const addCard = async (
   textContent: string,
@@ -239,14 +247,14 @@ export const addCard = async (
     // Add ID to cardsOrder collection
     await addOrder('cardsOrder', 'cards-order-id', uid);
     // Get cardsOrder collection
-    const cardsOrder = await getItems('cardsOrder');
+    const cardsOrder = await getOrder('cardsOrder', 'cards-order-id');
 
     const docRef = doc(db, 'cards', uid);
     await setDoc(docRef, {
       textContent: textContent,
       listId: listId,
       boardId: boardId,
-      cardIndex: cardsOrder?.[0].order.indexOf(uid),
+      cardIndex: cardsOrder.indexOf(uid),
     });
     console.log('Card created with ID: ', docRef.id);
   } catch (e) {
@@ -282,39 +290,6 @@ export const deleteCard = async (cardId: string) => {
 };
 
 export const dragCardsInSameList = async (cardsCopy: DocumentData[]) => {
-  // const cardsCopyIndexes: number[] = [];
-  // cardsCopy.forEach((card: DocumentData) => {
-  //   cardsCopyIndexes.push(card.cardIndex);
-  // });
-  // cardsCopyIndexes.sort((a, b) => a - b);
-
-  // const cardsOrder = await getItems('cardsOrder');
-  // const cardsOrderCopy = cardsOrder?.[0].order;
-
-  // for (let i = 0; i < cardsCopy.length; i++) {
-  //   const docRef = doc(db, 'cards', cardsCopy[i].id);
-  //   await updateDoc(docRef, {
-  //     cardIndex: cardsCopyIndexes[i],
-  //   });
-
-  //   const sourceIndex = cardsOrderCopy.findIndex(
-  //     (id: string) => id === cardsCopy[i].id,
-  //   );
-  //   cardsOrderCopy.splice(sourceIndex, 1);
-  //   cardsOrderCopy.splice(cardsCopyIndexes[i], 0, cardsCopy[i].id);
-  // }
-
-  // cardsOrderCopy.forEach(async (cardId: string) => {
-  //   const docOrderRef = doc(db, 'cardsOrder', 'cards-order-id');
-  //   await updateDoc(docOrderRef, {
-  //     order: arrayRemove(cardId),
-  //   });
-  // });
-
-  // cardsOrderCopy.forEach((cardId: string) => {
-  //   addOrder('cardsOrder', 'cards-order-id', cardId);
-  // });
-
   cardsCopy.forEach(async (card: DocumentData) => {
     const docOrderRef = doc(db, 'cardsOrder', 'cards-order-id');
     await updateDoc(docOrderRef, {
@@ -337,39 +312,8 @@ export const dragCardsBetweenList = async (
   cardId: string,
   listId: string,
 ) => {
-  // const cardsCopyIndexes: number[] = [];
-  // cardsCopy.forEach((card: DocumentData) => {
-  //   cardsCopyIndexes.push(card.cardIndex);
-  // });
-  // cardsCopyIndexes.sort((a, b) => a - b);
-
-  // const cardsOrder = await getItems('cardsOrder');
-  // const cardsOrderCopy = cardsOrder?.[0].order;
-
-  // for (let i = 0; i < cardsCopy.length; i++) {
-  //   const docRef = doc(db, 'cards', cardsCopy[i].id);
-  //   await updateDoc(docRef, {
-  //     cardIndex: cardsCopyIndexes[i],
-  //   });
-
-  //   const sourceIndex = cardsOrderCopy.findIndex(
-  //     (id: string) => id === cardsCopy[i].id,
-  //   );
-  //   cardsOrderCopy.splice(sourceIndex, 1);
-  //   cardsOrderCopy.splice(cardsCopyIndexes[i], 0, cardsCopy[i].id);
-  // }
-
-  // cardsOrderCopy.forEach(async (cardId: string) => {
-  //   const docOrderRef = doc(db, 'cardsOrder', 'cards-order-id');
-  //   await updateDoc(docOrderRef, {
-  //     order: arrayRemove(cardId),
-  //   });
-  // });
-
-  // cardsOrderCopy.forEach((cardId: string) => {
-  //   addOrder('cardsOrder', 'cards-order-id', cardId);
-  // });
-
+  // const cardsOrder1 = await getOrder('cardsOrder', 'cards-order-id');
+  // console.log(`1 : ${cardsOrder1}`);
   cardsCopy.forEach(async (card: DocumentData) => {
     const docOrderRef = doc(db, 'cardsOrder', 'cards-order-id');
     await updateDoc(docOrderRef, {
@@ -377,12 +321,18 @@ export const dragCardsBetweenList = async (
     });
   });
 
+  // const cardsOrder2 = await getOrder('cardsOrder', 'cards-order-id');
+  // console.log(`2 : ${cardsOrder2}`);
+
   cardsCopy.forEach(async (card: DocumentData) => {
     const docOrderRef = doc(db, 'cardsOrder', 'cards-order-id');
     await updateDoc(docOrderRef, {
       order: arrayUnion(card.id),
     });
   });
+
+  // const cardsOrder3 = await getOrder('cardsOrder', 'cards-order-id');
+  // console.log(`3 : ${cardsOrder3}`);
 
   await reOrderCard();
 

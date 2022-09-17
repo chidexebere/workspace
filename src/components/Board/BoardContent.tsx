@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import Breadcrumb from '../Breadcrumb';
 import { CreateList } from '../Create';
 import { List } from '../List';
@@ -22,7 +22,7 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
   const dragCardsInSameList = useDragCardsInSameList();
   const dragCardsBetweenList = useDragCardsBetweenList();
 
-  const handleOnDragEnd = (result: any) => {
+  const handleOnDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
 
     if (!destination) {
@@ -30,38 +30,73 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
     }
 
     if (source.droppableId === destination.droppableId && cards != undefined) {
-      // console.log(source.droppableId);
-      // console.log(destination.droppableId);
-
       const cardsCopy = cards.slice();
-      const [removed] = cardsCopy.splice(source.index, 1);
-      cardsCopy?.splice(destination.index, 0, removed);
+
+      console.log(cards.slice());
+      const sourceCardListFirstIndex = cardsCopy.findIndex(
+        (card) => card.listId === source.droppableId,
+      );
+
+      console.log(sourceCardListFirstIndex);
+      const sourceCardList = cardsCopy.filter(
+        (card) => card.listId === source.droppableId,
+      );
+
+      const [removed] = sourceCardList.splice(source.index, 1);
+      sourceCardList.splice(destination.index, 0, removed);
+
+      cardsCopy.splice(
+        sourceCardListFirstIndex,
+        sourceCardList.length,
+        ...sourceCardList,
+      );
+
+      console.log(cardsCopy);
+
       dragCardsInSameList.mutate(cardsCopy);
     }
 
     if (source.droppableId !== destination.droppableId && cards != undefined) {
-      // console.log(source.droppableId);
-      // console.log(destination.droppableId);
-      // const cardsCopy = cards.slice();
-      // cardsCopy.splice(source.index, 1);
-      // const destinationDroppableId = Number(destination.droppableId);
-      // dispatch(
-      //   dragCardsBetweenList(
-      //     cardsCopy,
-      //     draggableId,
-      //     destinationDroppableId,
-      //     destination.index,
-      //   ),
-      // );
+      console.log(source.droppableId);
+      console.log(destination.droppableId);
+
       const cardsCopy = cards.slice();
-      const [removed] = cardsCopy.splice(source.index, 1);
-      cardsCopy?.splice(destination.index, 0, removed);
-      // console.log(cardsCopy[source.index].cardIndex);
-      // console.log(cardsCopy[destination.index].cardIndex);
+
+      const sourceCardIndex = cardsCopy.findIndex(
+        (card) => card.id === draggableId,
+      );
+      // const [sourceCard] = cardsCopy.filter((card) => card.id === draggableId);
+      // cardsCopy.splice(sourceCardIndex, 1);
+
+      const [sourceCard] = cardsCopy.splice(sourceCardIndex, 1);
+
+      const destinationCardListFirstIndex = cardsCopy.findIndex(
+        (card) => card.listId === destination.droppableId,
+      );
+
+      console.log(destinationCardListFirstIndex);
+      console.log(source.index);
+      console.log(destination.index);
+
+      const destinationCardList = cardsCopy.filter(
+        (card) => card.listId === destination.droppableId,
+      );
+
+      cardsCopy.splice(
+        destinationCardListFirstIndex,
+        destinationCardList.length,
+      );
+      destinationCardList.splice(destination.index, 0, sourceCard);
+
+      cardsCopy.splice(
+        destinationCardListFirstIndex,
+        0,
+        ...destinationCardList,
+      );
 
       dragCardsBetweenList.mutate({
         cardsCopy,
-        cardId: removed.id,
+        cardId: draggableId,
         listId: destination.droppableId,
       });
     }
@@ -89,7 +124,7 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
                 boardId={boardId}
                 bgColor={boardBgColor}
                 lists={lists}
-                cards={cards}
+                cards={list.cards}
               />
             ))}
             <CreateList boardId={boardId} />

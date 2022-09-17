@@ -15,6 +15,7 @@ const BoardDetails = () => {
   const board = boardsData?.filter((item) => item.id === boardId);
 
   const { isLoading, data: lists } = useListsPerBoard(boardId as string);
+  console.log(lists);
 
   if (isLoading) {
     return <div>Loading...</div>;

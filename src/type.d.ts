@@ -23,6 +23,14 @@ type newCardObject = {
   boardId: string;
 };
 
+type cardObject = {
+  id: string;
+  boardId: string;
+  cardIndex: number;
+  textContent: string;
+  listId: string;
+};
+
 type dragBetweenObject = {
   cardsCopy: DocumentData[];
   cardId: string;

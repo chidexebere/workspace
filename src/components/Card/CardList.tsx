@@ -15,7 +15,7 @@ const CardList = ({ listId, cards }: CardListProps) => {
       {(provided) => (
         <div {...provided.droppableProps} ref={provided.innerRef}>
           <CardContainer>
-            {cardsByListId?.map((card, index) => (
+            {cards?.map((card, index) => (
               <Draggable key={card.id} draggableId={`${card.id}`} index={index}>
                 {(provided) => (
                   <div
