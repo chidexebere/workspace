@@ -4,7 +4,6 @@ import Breadcrumb from '../Breadcrumb';
 import { CreateList } from '../Create';
 import { List } from '../List';
 import {
-  useCardsPerBoard,
   useDragCardsInSameList,
   useDragCardsBetweenList,
 } from '../../api/hooks';
@@ -17,87 +16,49 @@ interface Props {
   lists: DocumentData[];
 }
 const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
-  const { data: cards } = useCardsPerBoard(boardId);
-
   const dragCardsInSameList = useDragCardsInSameList();
   const dragCardsBetweenList = useDragCardsBetweenList();
 
   const handleOnDragEnd = (result: DropResult) => {
-    const { destination, source, draggableId } = result;
+    const { destination, source } = result;
 
     if (!destination) {
       return;
     }
 
-    if (source.droppableId === destination.droppableId && cards != undefined) {
-      const cardsCopy = cards.slice();
+    if (source.droppableId === destination.droppableId) {
+      const list = lists.find((list) => list.id === source.droppableId);
 
-      console.log(cards.slice());
-      const sourceCardListFirstIndex = cardsCopy.findIndex(
-        (card) => card.listId === source.droppableId,
-      );
+      const cardsCopy = list?.cards.slice();
 
-      console.log(sourceCardListFirstIndex);
-      const sourceCardList = cardsCopy.filter(
-        (card) => card.listId === source.droppableId,
-      );
+      const [removed] = cardsCopy.splice(source.index, 1);
+      cardsCopy.splice(destination.index, 0, removed);
 
-      const [removed] = sourceCardList.splice(source.index, 1);
-      sourceCardList.splice(destination.index, 0, removed);
-
-      cardsCopy.splice(
-        sourceCardListFirstIndex,
-        sourceCardList.length,
-        ...sourceCardList,
-      );
-
-      console.log(cardsCopy);
-
-      dragCardsInSameList.mutate(cardsCopy);
+      dragCardsInSameList.mutate({
+        cards: cardsCopy,
+        listId: source.droppableId,
+        boardId,
+      });
     }
 
-    if (source.droppableId !== destination.droppableId && cards != undefined) {
-      console.log(source.droppableId);
-      console.log(destination.droppableId);
-
-      const cardsCopy = cards.slice();
-
-      const sourceCardIndex = cardsCopy.findIndex(
-        (card) => card.id === draggableId,
-      );
-      // const [sourceCard] = cardsCopy.filter((card) => card.id === draggableId);
-      // cardsCopy.splice(sourceCardIndex, 1);
-
-      const [sourceCard] = cardsCopy.splice(sourceCardIndex, 1);
-
-      const destinationCardListFirstIndex = cardsCopy.findIndex(
-        (card) => card.listId === destination.droppableId,
+    if (source.droppableId !== destination.droppableId) {
+      const sourceList = lists.find((list) => list.id === source.droppableId);
+      const destList = lists.find(
+        (list) => list.id === destination.droppableId,
       );
 
-      console.log(destinationCardListFirstIndex);
-      console.log(source.index);
-      console.log(destination.index);
+      const sourceCardsCopy = sourceList?.cards.slice();
+      const destCardsCopy = destList?.cards.slice();
 
-      const destinationCardList = cardsCopy.filter(
-        (card) => card.listId === destination.droppableId,
-      );
-
-      cardsCopy.splice(
-        destinationCardListFirstIndex,
-        destinationCardList.length,
-      );
-      destinationCardList.splice(destination.index, 0, sourceCard);
-
-      cardsCopy.splice(
-        destinationCardListFirstIndex,
-        0,
-        ...destinationCardList,
-      );
+      const [removed] = sourceCardsCopy.splice(source.index, 1);
+      destCardsCopy.splice(destination.index, 0, removed);
 
       dragCardsBetweenList.mutate({
-        cardsCopy,
-        cardId: draggableId,
-        listId: destination.droppableId,
+        sourceCards: sourceCardsCopy,
+        destCards: destCardsCopy,
+        sourceListId: source.droppableId,
+        destListId: destination.droppableId,
+        boardId,
       });
     }
   };
@@ -123,7 +84,7 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
                 listId={list.id}
                 boardId={boardId}
                 bgColor={boardBgColor}
-                lists={lists}
+                // list={list}
                 cards={list.cards}
               />
             ))}

@@ -2,6 +2,11 @@ type Params = {
   id: string;
 };
 
+type Timestamp = {
+  seconds: number;
+  nanoseconds: number;
+};
+
 type newBoardObject = {
   title: string;
   bgColor: string;
@@ -12,9 +17,23 @@ type newListObject = {
   title: string;
 };
 
+// type listObject = {
+//   id: string;
+//   title: string;
+//   cards: string[];
+//   createdAt: Timestamp;
+// };
+
+type dragCardsObject = {
+  cards: string[];
+  listId: string;
+  boardId: string;
+};
+
 type existingListObject = {
   title: string;
   listId: string;
+  boardId: string;
 };
 
 type newCardObject = {
@@ -24,15 +43,16 @@ type newCardObject = {
 };
 
 type cardObject = {
-  id: string;
+  cardId: string;
   boardId: string;
-  cardIndex: number;
-  textContent: string;
+  // textContent: string;
   listId: string;
 };
 
-type dragBetweenObject = {
-  cardsCopy: DocumentData[];
-  cardId: string;
-  listId: string;
+type dragCardsBetweenObject = {
+  sourceCards: string[];
+  destCards: string[];
+  sourceListId: string;
+  destListId: string;
+  boardId: string;
 };

@@ -11,17 +11,20 @@ import {
   editCard,
   editList,
   getBoards,
-  getCardsPerBoard,
   getListsPerBoard,
   dragCardsInSameList,
   dragCardsBetweenList,
 } from '.';
 
 // Get boards
-const useBoards = (isFetching: boolean) => {
-  return useQuery<DocumentData[], Error>('boards', getBoards, {
-    enabled: isFetching,
-  });
+// const useBoards = (isFetching: boolean) => {
+//   return useQuery<DocumentData[], Error>('boards', getBoards, {
+//     enabled: isFetching,
+//   });
+// };
+
+const useBoards = () => {
+  return useQuery<DocumentData[], Error>('boards', getBoards);
 };
 
 // Use cached board data
@@ -180,8 +183,8 @@ const useAddList = () => {
 const useEditList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ title, listId }: existingListObject) => {
-      return editList(title, listId);
+    ({ title, listId, boardId }: existingListObject) => {
+      return editList(title, listId, boardId);
     },
     {
       onSuccess: () => {
@@ -196,8 +199,8 @@ const useEditList = () => {
 const useDeleteList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    (listId: string) => {
-      return deleteList(listId);
+    ({ listId, boardId }: existingListObject) => {
+      return deleteList(listId, boardId);
     },
     {
       onMutate: async (listId) => {
@@ -224,45 +227,41 @@ const useDeleteList = () => {
   );
 };
 
-// Get cards per board
-const useCardsPerBoard = (boardId: string) => {
-  return useQuery<DocumentData[]>(['cards'], () => getCardsPerBoard(boardId));
-};
+// // Get cards per board
+// const useCardsPerBoard = (boardId: string) => {
+//   return useQuery<DocumentData[]>(['cards'], () => getCardsPerBoard(boardId));
+// };
 
 // Add List
 const useAddCard = () => {
   const queryClient = useQueryClient();
+  // Get ID
+
   return useMutation(
     ({ textContent, listId, boardId }: newCardObject) => {
       return addCard(textContent, listId, boardId);
     },
     {
-      onMutate: async ({ textContent, listId, boardId }: newCardObject) => {
-        await queryClient.cancelQueries('cards');
+      onMutate: async ({ textContent, listId }) => {
+        // const uid = uuidv4();
+        await queryClient.cancelQueries('lists');
+        const previousLists = queryClient.getQueryData<DocumentData[]>('lists');
 
-        const previousCards = queryClient.getQueryData<DocumentData[]>('cards');
+        const currentLists = previousLists?.map((list) => {
+          if (list.id === listId) {
+            list.cards = [...list.cards, textContent];
+          }
+          return list;
+        });
 
-        if (previousCards) {
-          queryClient.setQueryData<DocumentData[]>('cards', [
-            ...previousCards,
-            { textContent, listId, boardId },
-          ]);
+        if (currentLists) {
+          queryClient.setQueryData<DocumentData[]>('lists', [...currentLists]);
         }
-
-        return { previousCards };
-      },
-      // If the mutation fails, use the context returned from onMutate to roll back
-      onError: (err, variables, context) => {
-        if (context?.previousCards) {
-          queryClient.setQueryData<DocumentData[]>(
-            'cards',
-            context.previousCards,
-          );
-        }
+        return { currentLists };
       },
       // Always refetch after error or success:
       onSettled: () => {
-        queryClient.invalidateQueries('cards');
+        queryClient.invalidateQueries('lists');
       },
     },
   );
@@ -277,13 +276,13 @@ const useEditCard = () => {
       textContent,
       listId,
       boardId,
-    }: newCardObject & { cardId: string }) => {
+    }: newCardObject & { cardId: number }) => {
       return editCard(cardId, textContent, listId, boardId);
     },
     {
       onSuccess: () => {
         // ✅ refetch cards after mutation is successfull
-        queryClient.invalidateQueries(['cards']);
+        queryClient.invalidateQueries(['lists']);
       },
     },
   );
@@ -293,29 +292,13 @@ const useEditCard = () => {
 const useDeleteCard = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    (cardId: string) => {
-      return deleteCard(cardId);
+    ({ textContent, listId, boardId }: newCardObject) => {
+      return deleteCard(textContent, listId, boardId);
     },
     {
-      onMutate: async (cardId) => {
-        await queryClient.cancelQueries('cards');
-
-        // Snapshot the previous value
-        const previousCards = queryClient.getQueryData<DocumentData[]>('cards');
-
-        // Optimistically update to the new value
-        if (previousCards) {
-          const filteredCards = previousCards.filter(
-            (card) => card.id !== cardId,
-          );
-          queryClient.setQueryData<DocumentData[]>('cards', [...filteredCards]);
-        }
-
-        return { previousCards };
-      },
-      // Always refetch after error or success:
-      onSettled: () => {
-        queryClient.invalidateQueries('cards');
+      onSuccess: () => {
+        // ✅ refetch cards after mutation is successfull
+        queryClient.invalidateQueries(['lists']);
       },
     },
   );
@@ -325,26 +308,36 @@ const useDeleteCard = () => {
 const useDragCardsInSameList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    (cardsCopy: DocumentData[]) => {
-      return dragCardsInSameList(cardsCopy);
+    ({ cards, listId, boardId }: dragCardsObject) => {
+      return dragCardsInSameList({ cards, listId, boardId });
     },
     {
-      onMutate: async (cardsCopy) => {
-        await queryClient.cancelQueries('cards');
+      onMutate: async ({ cards, listId }) => {
+        await queryClient.cancelQueries('lists');
+        const previousLists = queryClient.getQueryData<DocumentData[]>('lists');
 
-        // Snapshot the previous value
-        const previousCards = queryClient.getQueryData<DocumentData[]>('cards');
+        const currentLists = previousLists?.map((list) => {
+          if (list.id === listId) {
+            list.cards = cards;
+          }
+          return list;
+        });
 
-        // Optimistically update to the new value
-        if (previousCards) {
-          queryClient.setQueryData<DocumentData[]>('cards', [...cardsCopy]);
+        if (currentLists) {
+          queryClient.setQueryData<DocumentData[]>('lists', [...currentLists]);
         }
-        return { previousCards };
+
+        return { currentLists };
       },
       // Always refetch after error or success:
       onSettled: () => {
-        queryClient.invalidateQueries('cards');
+        queryClient.invalidateQueries('lists');
       },
+
+      // onSuccess: () => {
+      //   // ✅ refetch cards after mutation is successfull
+      //   queryClient.invalidateQueries(['lists']);
+      // },
     },
   );
 };
@@ -352,27 +345,51 @@ const useDragCardsInSameList = () => {
 const useDragCardsBetweenList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ cardsCopy, cardId, listId }: dragBetweenObject) => {
-      return dragCardsBetweenList(cardsCopy, cardId, listId);
+    ({
+      sourceCards,
+      destCards,
+      sourceListId,
+      destListId,
+      boardId,
+    }: dragCardsBetweenObject) => {
+      return dragCardsBetweenList({
+        sourceCards,
+        destCards,
+        sourceListId,
+        destListId,
+        boardId,
+      });
     },
     {
-      onMutate: async ({ cardsCopy, cardId, listId }: dragBetweenObject) => {
-        await queryClient.cancelQueries('cards');
+      onMutate: async ({
+        sourceCards,
+        destCards,
+        sourceListId,
+        destListId,
+      }) => {
+        await queryClient.cancelQueries('lists');
+        const previousLists = queryClient.getQueryData<DocumentData[]>('lists');
 
-        // Snapshot the previous value
-        const previousCards = queryClient.getQueryData<DocumentData[]>('cards');
-        const cardCopyIndex = cardsCopy.findIndex((card) => card.id === cardId);
-        cardsCopy[cardCopyIndex].listId = listId;
+        const currentLists = previousLists?.map((list) => {
+          if (list.id === sourceListId) {
+            list.cards = sourceCards;
+          }
 
-        // Optimistically update to the new value
-        if (previousCards) {
-          queryClient.setQueryData<DocumentData[]>('cards', [...cardsCopy]);
+          if (list.id === destListId) {
+            list.cards = destCards;
+          }
+          return list;
+        });
+
+        if (currentLists) {
+          queryClient.setQueryData<DocumentData[]>('lists', [...currentLists]);
         }
-        return { previousCards };
+
+        return { currentLists };
       },
       // Always refetch after error or success:
       onSettled: () => {
-        queryClient.invalidateQueries('cards');
+        queryClient.invalidateQueries('lists');
       },
     },
   );
@@ -388,7 +405,6 @@ export {
   useAddList,
   useEditList,
   useDeleteList,
-  useCardsPerBoard,
   useAddCard,
   useEditCard,
   useDeleteCard,

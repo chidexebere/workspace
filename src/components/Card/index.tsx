@@ -84,15 +84,16 @@ interface EditCardProps {
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => void;
   toggleOpenCardModal: () => void;
-  listId?: string;
-  cardId: string;
+  listId: string;
+  boardId: string;
 }
 const EditCard = ({
   textContent,
   onChange,
   handleSubmit,
   toggleOpenCardModal,
-  cardId,
+  listId,
+  boardId,
 }: EditCardProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showShareLink, setShowShareLink] = useState(false);
@@ -118,7 +119,7 @@ const EditCard = ({
   ) => {
     e.preventDefault();
     // const filteredCards = cards.filter((card) => card.id !== cardId);
-    deleteCard.mutate(cardId);
+    deleteCard.mutate({ textContent, listId, boardId });
     // setCards(filteredCards);
     toggleDeleteModal();
     toggleOpenCardModal();
@@ -224,7 +225,7 @@ const CardContent = ({ textContent, handleClick }: CardContentProps) => {
 
 interface CardProps {
   textContent: string;
-  cardId: string;
+  cardId: number;
   listId: string;
 }
 const Card = ({ textContent, cardId, listId }: CardProps) => {
@@ -283,7 +284,7 @@ const Card = ({ textContent, cardId, listId }: CardProps) => {
           toggleOpenCardModal={closeEdit}
           handleSubmit={handleEditCard}
           listId={listId}
-          cardId={cardId}
+          boardId={boardId}
         />
       </Modal>
 

@@ -1,33 +1,30 @@
 import { Draggable, Droppable } from 'react-beautiful-dnd';
-import { DocumentData } from 'firebase/firestore';
 import { Card, CardContainer } from '.';
 
 interface CardListProps {
   listId: string;
-  cards?: DocumentData[];
+  cards: string[];
 }
 
 const CardList = ({ listId, cards }: CardListProps) => {
-  const cardsByListId = cards?.filter((card) => card.listId === listId);
-
   return (
     <Droppable droppableId={`${listId}`} type="card">
       {(provided) => (
         <div {...provided.droppableProps} ref={provided.innerRef}>
           <CardContainer>
             {cards?.map((card, index) => (
-              <Draggable key={card.id} draggableId={`${card.id}`} index={index}>
+              <Draggable
+                key={`${card}${listId}}`}
+                draggableId={`${card}${listId}}`}
+                index={index}
+              >
                 {(provided) => (
                   <div
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                   >
-                    <Card
-                      textContent={card.textContent}
-                      cardId={card.id}
-                      listId={listId}
-                    />
+                    <Card textContent={card} cardId={index} listId={listId} />
                   </div>
                 )}
               </Draggable>

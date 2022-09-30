@@ -5,17 +5,19 @@ import Layout from '../layout';
 
 const BoardDetails = () => {
   const cachedBoardsData = useCachedBoards();
-  const { data: boards } = useBoards(
-    cachedBoardsData === undefined ? true : false,
-  );
+  // const { data: boards } = useBoards(
+  //   cachedBoardsData === undefined ? true : false,
+  // );
+
+  const { data: boards } = useBoards();
 
   const boardsData = cachedBoardsData === undefined ? boards : cachedBoardsData;
 
   const { id: boardId } = useParams<Params>();
-  const board = boardsData?.filter((item) => item.id === boardId);
+  const board = boardsData?.find((item) => item.id === boardId);
 
   const { isLoading, data: lists } = useListsPerBoard(boardId as string);
-  console.log(lists);
+  // console.log(lists);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -25,9 +27,9 @@ const BoardDetails = () => {
     <Layout>
       {board && lists && (
         <BoardContent
-          boardId={board[0].id}
-          boardTitle={board[0].title}
-          boardBgColor={board[0].bgColor}
+          boardId={board.id}
+          boardTitle={board.title}
+          boardBgColor={board.bgColor}
           lists={lists}
         />
       )}

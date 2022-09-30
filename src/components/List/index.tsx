@@ -5,7 +5,6 @@ import { TrashIcon } from '@heroicons/react/solid';
 import Button from '../Button';
 import Modal from '../Modal';
 import CardList from '../Card/CardList';
-import { DocumentData } from 'firebase/firestore';
 import { useDeleteList, useEditList } from '../../api/hooks';
 
 interface ListContainerProps {
@@ -130,8 +129,8 @@ interface ListProps {
   bgColor: string;
   listId: string;
   boardId: string;
-  lists: DocumentData[];
-  cards?: DocumentData[];
+  // lists: DocumentData[];
+  cards: string[];
 }
 const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -164,7 +163,7 @@ const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
   ) => {
     e.preventDefault();
     if (newTitle) {
-      editList.mutate({ title: newTitle, listId });
+      editList.mutate({ title: newTitle, listId, boardId });
     }
     setIsEditing(false);
   };
@@ -173,7 +172,7 @@ const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
-    deleteList.mutate(listId);
+    deleteList.mutate({ title: '', listId, boardId });
     toggleModal();
   };
 
