@@ -17,36 +17,16 @@ type newListObject = {
   title: string;
 };
 
-// type listObject = {
-//   id: string;
-//   title: string;
-//   cards: string[];
-//   createdAt: Timestamp;
-// };
-
-type dragCardsObject = {
-  cards: string[];
-  listId: string;
-  boardId: string;
-};
-
-type existingListObject = {
-  title: string;
-  listId: string;
-  boardId: string;
-};
-
 type newCardObject = {
   textContent: string;
   listId: string;
   boardId: string;
 };
 
-type cardObject = {
-  cardId: string;
-  boardId: string;
-  // textContent: string;
+type dragCardsObject = {
+  cards: string[];
   listId: string;
+  boardId: string;
 };
 
 type dragCardsBetweenObject = {

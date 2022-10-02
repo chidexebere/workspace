@@ -1,21 +1,19 @@
-import { Link } from 'react-router-dom';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import Breadcrumb from '../Breadcrumb';
 import { CreateList } from '../Create';
 import { List } from '../List';
 import {
   useDragCardsInSameList,
   useDragCardsBetweenList,
+  useListsPerBoard,
 } from '../../api/hooks';
-import { DocumentData } from 'firebase/firestore';
 
 interface Props {
   boardId: string;
-  boardTitle: string;
   boardBgColor: string;
-  lists: DocumentData[];
 }
-const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
+const BoardContent = ({ boardId, boardBgColor }: Props) => {
+  const { isLoading, data: lists } = useListsPerBoard(boardId as string);
+
   const dragCardsInSameList = useDragCardsInSameList();
   const dragCardsBetweenList = useDragCardsBetweenList();
 
@@ -27,7 +25,7 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
     }
 
     if (source.droppableId === destination.droppableId) {
-      const list = lists.find((list) => list.id === source.droppableId);
+      const list = lists?.find((list) => list.id === source.droppableId);
 
       const cardsCopy = list?.cards.slice();
 
@@ -42,8 +40,8 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
     }
 
     if (source.droppableId !== destination.droppableId) {
-      const sourceList = lists.find((list) => list.id === source.droppableId);
-      const destList = lists.find(
+      const sourceList = lists?.find((list) => list.id === source.droppableId);
+      const destList = lists?.find(
         (list) => list.id === destination.droppableId,
       );
 
@@ -63,36 +61,28 @@ const BoardContent = ({ boardId, boardTitle, boardBgColor, lists }: Props) => {
     }
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <>
-      <Breadcrumb>
-        <li className="text-gray-600 hover:text-gray-800">
-          <Link to={`/boards`}>Dashboard</Link>
-        </li>
-        <li>
-          <span className="text-gray-500 mx-2">/</span>
-        </li>
-        <li className="">{boardTitle}</li>
-      </Breadcrumb>
-      <DragDropContext onDragEnd={handleOnDragEnd}>
-        {lists && (
-          <div className="mt-10 grid grid-flow-col overflow-x-auto h-full items-start auto-cols-220 gap-x-2 md:auto-cols-270 md:gap-x-4">
-            {lists.map((list) => (
-              <List
-                key={list.id}
-                title={list.title}
-                listId={list.id}
-                boardId={boardId}
-                bgColor={boardBgColor}
-                // list={list}
-                cards={list.cards}
-              />
-            ))}
-            <CreateList boardId={boardId} />
-          </div>
-        )}
-      </DragDropContext>
-    </>
+    <DragDropContext onDragEnd={handleOnDragEnd}>
+      {lists && (
+        <div className="mt-10 grid grid-flow-col overflow-x-auto h-full items-start auto-cols-220 gap-x-2 md:auto-cols-270 md:gap-x-4">
+          {lists.map((list) => (
+            <List
+              key={list.id}
+              title={list.title}
+              listId={list.id}
+              boardId={boardId}
+              bgColor={boardBgColor}
+              cards={list.cards}
+            />
+          ))}
+          <CreateList boardId={boardId} />
+        </div>
+      )}
+    </DragDropContext>
   );
 };
 

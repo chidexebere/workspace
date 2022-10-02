@@ -1,6 +1,7 @@
-import { useParams } from 'react-router-dom';
-import { useBoards, useCachedBoards, useListsPerBoard } from '../api/hooks';
+import { useParams, Link } from 'react-router-dom';
+import { useBoards, useCachedBoards } from '../api/hooks';
 import BoardContent from '../components/Board/BoardContent';
+import Breadcrumb from '../components/Breadcrumb';
 import Layout from '../layout';
 
 const BoardDetails = () => {
@@ -16,22 +17,22 @@ const BoardDetails = () => {
   const { id: boardId } = useParams<Params>();
   const board = boardsData?.find((item) => item.id === boardId);
 
-  const { isLoading, data: lists } = useListsPerBoard(boardId as string);
-  // console.log(lists);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <Layout>
-      {board && lists && (
-        <BoardContent
-          boardId={board.id}
-          boardTitle={board.title}
-          boardBgColor={board.bgColor}
-          lists={lists}
-        />
+      {board && (
+        <>
+          <Breadcrumb>
+            <li className="text-gray-600 hover:text-gray-800">
+              <Link to={`/boards`}>Dashboard</Link>
+            </li>
+            <li>
+              <span className="text-gray-500 mx-2">/</span>
+            </li>
+            <li className="">{board.title}</li>
+          </Breadcrumb>
+
+          <BoardContent boardId={board.id} boardBgColor={board.bgColor} />
+        </>
       )}
     </Layout>
   );

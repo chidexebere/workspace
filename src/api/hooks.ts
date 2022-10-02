@@ -88,11 +88,40 @@ const useEditBoard = () => {
       return editBoard(boardId, title, bgColor);
     },
     {
-      onSuccess: () => {
-        // ✅ refetch boards after mutation is successfull
-        queryClient.invalidateQueries(['boards']);
+      onMutate: async ({ boardId, title, bgColor }) => {
+        await queryClient.cancelQueries('boards');
+
+        const previousBoards =
+          queryClient.getQueryData<DocumentData[]>('boards');
+
+        const currentBoards = previousBoards?.map((board) => {
+          if (board.id === boardId) {
+            board.title = title;
+            board.bgColor = bgColor;
+          }
+          return board;
+        });
+
+        // Optimistically update to the new value
+        if (currentBoards) {
+          queryClient.setQueryData<DocumentData[]>('boards', [
+            ...currentBoards,
+          ]);
+        }
+
+        return { currentBoards };
+      },
+
+      onSettled: () => {
+        queryClient.invalidateQueries('boards');
       },
     },
+    // {
+    //   onSuccess: () => {
+    //     // ✅ refetch boards after mutation is successfull
+    //     queryClient.invalidateQueries(['boards']);
+    //   },
+    // },
   );
 };
 
@@ -183,7 +212,7 @@ const useAddList = () => {
 const useEditList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ title, listId, boardId }: existingListObject) => {
+    ({ title, boardId, listId }: newListObject & { listId: string }) => {
       return editList(title, listId, boardId);
     },
     {
@@ -199,13 +228,12 @@ const useEditList = () => {
 const useDeleteList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ listId, boardId }: existingListObject) => {
+    ({ listId, boardId }: newListObject & { listId: string }) => {
       return deleteList(listId, boardId);
     },
     {
       onMutate: async (listId) => {
         await queryClient.cancelQueries('lists');
-
         // Snapshot the previous value
         const previousLists = queryClient.getQueryData<DocumentData[]>('lists');
 
@@ -226,11 +254,6 @@ const useDeleteList = () => {
     },
   );
 };
-
-// // Get cards per board
-// const useCardsPerBoard = (boardId: string) => {
-//   return useQuery<DocumentData[]>(['cards'], () => getCardsPerBoard(boardId));
-// };
 
 // Add List
 const useAddCard = () => {
