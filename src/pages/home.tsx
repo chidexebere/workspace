@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import KanbanBoardImage from '../images/kanban-board.png';
+import KanbanBoardImage from '../assets/images/kanban-board.png';
 
 const Home = () => {
   return (
