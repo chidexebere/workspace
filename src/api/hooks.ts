@@ -15,6 +15,7 @@ import {
   dragCardsInSameList,
   dragCardsBetweenList,
 } from '.';
+import { addNewUser } from './auth';
 
 // Get boards
 // const useBoards = (isFetching: boolean) => {
@@ -22,6 +23,22 @@ import {
 //     enabled: isFetching,
 //   });
 // };
+
+// Add new user
+const useAddNewUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    ({ fullname, email, password }: newUser) => {
+      return addNewUser({ fullname, email, password });
+    },
+    {
+      onSuccess: () => {
+        // ✅ refetch lists after mutation is successfull
+        queryClient.invalidateQueries(['users']);
+      },
+    },
+  );
+};
 
 const useBoards = () => {
   return useQuery<DocumentData[], Error>('boards', getBoards);
@@ -419,6 +436,7 @@ const useDragCardsBetweenList = () => {
 };
 
 export {
+  useAddNewUser,
   useBoards,
   useCachedBoards,
   useAddBoard,

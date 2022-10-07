@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const APIKEY = process.env.REACT_APP_FIREBASE_CONFIG_KEY;
 
@@ -19,4 +20,7 @@ const app = initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
-export { app, db };
+// Initialize Firebase Authentication and get a reference to the service
+const auth = getAuth(app);
+
+export { app, db, auth };

@@ -2,6 +2,7 @@ import { Formik, Form, Field, FormikHelpers, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import cx from 'classnames';
 import GoogleIcon from '../assets/icons/google.svg';
+import { Link } from 'react-router-dom';
 
 interface Values {
   email: string;
@@ -19,9 +20,11 @@ const Login = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="container max-w-sm mx-auto flex-1 flex flex-col items-center justify-center px-2">
-        <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 mb-6 sm:text-5xl md:text-6xl">
-          <span className="block text-teal-500 xl:inline">WorkSpace</span>
-        </h1>
+        <Link to="/">
+          <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 mb-6 sm:text-5xl md:text-6xl">
+            <span className="block text-teal-500 xl:inline">WorkSpace</span>
+          </h1>
+        </Link>
         <Formik
           initialValues={{ email: '', password: '' }}
           validationSchema={validationSchema}
@@ -97,13 +100,12 @@ const Login = () => {
         </Formik>
         <div className="text-grey-dark mt-6">
           Don&apos;t have an account?{' '}
-          <a
-            className="no-underline border-b border-blue text-blue"
-            href="../login/"
+          <Link
+            to="/signup"
+            className="underline border-b border-blue text-blue-500"
           >
             Sign up
-          </a>
-          .
+          </Link>
         </div>
       </div>
     </div>

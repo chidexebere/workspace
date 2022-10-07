@@ -36,3 +36,9 @@ type dragCardsBetweenObject = {
   destListId: string;
   boardId: string;
 };
+
+type newUser = {
+  fullname: string;
+  email: string;
+  password: string;
+};
