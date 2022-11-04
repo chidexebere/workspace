@@ -1,4 +1,4 @@
-import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 import { CreateList } from '../Create';
 import { List } from '../List';
 import {
