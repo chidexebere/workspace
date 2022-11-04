@@ -1,3 +1,4 @@
+import { User } from 'firebase/auth';
 import {
   addDoc,
   arrayRemove,
@@ -14,11 +15,33 @@ import {
   setDoc,
   updateDoc,
 } from 'firebase/firestore';
-import { db } from '../firebase/firebase.config';
+import { db } from '../firebase.config';
+
+// Users
+// Add new user on auth change
+export const addNewUserIfNotFound = async (user: User) => {
+  const docRef = doc(db, 'users', user.uid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    console.log('User already exits');
+  } else {
+    setDoc(
+      docRef,
+      {
+        createdAt: serverTimestamp(),
+      },
+      { merge: true },
+    );
+  }
+};
 
 // Boards
-export const getBoards = async () => {
-  const q = query(collection(db, 'boards'), orderBy('createdAt', 'asc'));
+export const getBoards = async (userId: string) => {
+  const q = query(
+    collection(db, `users/${userId}/boards`),
+    orderBy('createdAt', 'asc'),
+  );
   const querySnapshot = await getDocs(q);
   const documents: DocumentData[] = [];
   querySnapshot.forEach((doc) => {
@@ -27,10 +50,14 @@ export const getBoards = async () => {
   return documents;
 };
 
-export const addBoard = async (title: string, bgColor: string) => {
+export const addBoard = async (
+  userId: string,
+  title: string,
+  bgColor: string,
+) => {
   try {
     // Add a new board with a generated id.
-    const docRef = await addDoc(collection(db, 'boards'), {
+    const docRef = await addDoc(collection(db, `users/${userId}/boards`), {
       title: title,
       bgColor: bgColor,
       createdAt: serverTimestamp(),
@@ -42,11 +69,12 @@ export const addBoard = async (title: string, bgColor: string) => {
 };
 
 export const editBoard = async (
+  userId: string,
   boardId: string,
   title: string,
   bgColor: string,
 ) => {
-  const docRef = doc(db, 'boards', boardId);
+  const docRef = doc(db, `users/${userId}/boards`, boardId);
 
   await updateDoc(docRef, {
     title: title,
@@ -54,14 +82,14 @@ export const editBoard = async (
   });
 };
 
-export const deleteBoard = async (boardId: string) => {
-  await deleteDoc(doc(db, 'boards', boardId));
+export const deleteBoard = async (userId: string, boardId: string) => {
+  await deleteDoc(doc(db, `users/${userId}/boards`, boardId));
 };
 
 // Lists
-export const getListsPerBoard = async (boardId: string) => {
+export const getListsPerBoard = async (userId: string, boardId: string) => {
   const q = query(
-    collection(db, `boards/${boardId}/lists`),
+    collection(db, `users/${userId}/boards/${boardId}/lists`),
     orderBy('createdAt', 'asc'),
   );
   const querySnapshot = await getDocs(q);
@@ -72,14 +100,21 @@ export const getListsPerBoard = async (boardId: string) => {
   return documents;
 };
 
-export const addList = async (title: string, boardId: string) => {
+export const addList = async (
+  title: string,
+  userId: string,
+  boardId: string,
+) => {
   try {
     // Add a new list with a generated id.
-    const docRef = await addDoc(collection(db, `boards/${boardId}/lists`), {
-      title: title,
-      cards: [],
-      createdAt: serverTimestamp(),
-    });
+    const docRef = await addDoc(
+      collection(db, `users/${userId}/boards/${boardId}/lists`),
+      {
+        title: title,
+        cards: [],
+        createdAt: serverTimestamp(),
+      },
+    );
     console.log('List created with ID: ', docRef.id);
   } catch (e) {
     console.error('Error creating board: ', e);
@@ -89,16 +124,21 @@ export const addList = async (title: string, boardId: string) => {
 export const editList = async (
   title: string,
   listId: string,
+  userId: string,
   boardId: string,
 ) => {
-  const docRef = doc(db, `boards/${boardId}/lists`, listId);
+  const docRef = doc(db, `users/${userId}/boards/${boardId}/lists`, listId);
   await updateDoc(docRef, {
     title: title,
   });
 };
 
-export const deleteList = async (listId: string, boardId: string) => {
-  await deleteDoc(doc(db, `boards/${boardId}/lists`, listId));
+export const deleteList = async (
+  listId: string,
+  boardId: string,
+  userId: string,
+) => {
+  await deleteDoc(doc(db, `users/${userId}/boards/${boardId}/lists`, listId));
 };
 
 // Cards
@@ -106,10 +146,11 @@ export const addCard = async (
   textContent: string,
   listId: string,
   boardId: string,
+  userId: string,
 ) => {
   try {
     // Add a new list with a generated id.
-    const docRef = doc(db, `boards/${boardId}/lists`, listId);
+    const docRef = doc(db, `users/${userId}/boards/${boardId}/lists`, listId);
     await updateDoc(docRef, {
       cards: arrayUnion(textContent),
     });
@@ -125,8 +166,9 @@ export const editCard = async (
   textContent: string,
   listId: string,
   boardId: string,
+  userId: string,
 ) => {
-  const docRef = doc(db, `boards/${boardId}/lists`, listId);
+  const docRef = doc(db, `users/${userId}/boards/${boardId}/lists`, listId);
   const list = (await getDoc(docRef)).data();
   const cards = list?.cards;
   cards.splice(cardId, 1, textContent);
@@ -144,8 +186,9 @@ export const deleteCard = async (
   textContent: string,
   listId: string,
   boardId: string,
+  userId: string,
 ) => {
-  const docRef = doc(db, `boards/${boardId}/lists`, listId);
+  const docRef = doc(db, `users/${userId}/boards/${boardId}/lists`, listId);
   await updateDoc(docRef, {
     cards: arrayRemove(textContent),
   });
@@ -155,8 +198,9 @@ export const dragCardsInSameList = async ({
   cards,
   listId,
   boardId,
+  userId,
 }: dragCardsObject) => {
-  const docRef = doc(db, `boards/${boardId}/lists`, listId);
+  const docRef = doc(db, `users/${userId}/boards/${boardId}/lists`, listId);
   await setDoc(
     docRef,
     {
@@ -172,8 +216,13 @@ export const dragCardsBetweenList = async ({
   sourceListId,
   destListId,
   boardId,
+  userId,
 }: dragCardsBetweenObject) => {
-  const docSourceRef = doc(db, `boards/${boardId}/lists`, sourceListId);
+  const docSourceRef = doc(
+    db,
+    `users/${userId}/boards/${boardId}/lists`,
+    sourceListId,
+  );
   await setDoc(
     docSourceRef,
     {

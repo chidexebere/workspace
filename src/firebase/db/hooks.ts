@@ -15,51 +15,27 @@ import {
   dragCardsInSameList,
   dragCardsBetweenList,
 } from '.';
-import { addNewUser } from './auth';
 
-// Get boards
-// const useBoards = (isFetching: boolean) => {
-//   return useQuery<DocumentData[], Error>('boards', getBoards, {
-//     enabled: isFetching,
-//   });
-// };
-
-// Add new user
-const useAddNewUser = () => {
-  const queryClient = useQueryClient();
-  return useMutation(
-    ({ fullname, email, password }: newUser) => {
-      return addNewUser({ fullname, email, password });
-    },
-    {
-      onSuccess: () => {
-        // ✅ refetch lists after mutation is successfull
-        queryClient.invalidateQueries(['users']);
-      },
-    },
-  );
-};
-
-const useBoards = () => {
-  return useQuery<DocumentData[], Error>('boards', getBoards);
+export const useBoards = (userId: string) => {
+  return useQuery<DocumentData[], Error>('boards', () => getBoards(userId));
 };
 
 // Use cached board data
-const useCachedBoards = () => {
+export const useCachedBoards = () => {
   const queryClient = useQueryClient();
   return queryClient.getQueryData<DocumentData[]>(['boards']);
 };
 
 // Add board
-const useAddBoard = () => {
+export const useAddBoard = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ title, bgColor }: newBoardObject) => {
-      return addBoard(title, bgColor);
+    ({ userId, title, bgColor }: newBoardObject) => {
+      return addBoard(userId, title, bgColor);
     },
     {
       // When mutate is called:
-      onMutate: async ({ title, bgColor }: newBoardObject) => {
+      onMutate: async ({ title, bgColor }) => {
         // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await queryClient.cancelQueries('boards');
 
@@ -81,14 +57,14 @@ const useAddBoard = () => {
         return { previousBoards };
       },
       // If the mutation fails, use the context returned from onMutate to roll back
-      onError: (err, variables, context) => {
-        if (context?.previousBoards) {
-          queryClient.setQueryData<DocumentData[]>(
-            'boards',
-            context.previousBoards,
-          );
-        }
-      },
+      // onError: (err, variables, context) => {
+      //   if (context?.previousBoards !== undefined) {
+      //     queryClient.setQueryData<DocumentData[]>(
+      //       'boards',
+      //       context.previousBoards,
+      //     );
+      //   }
+      // },
       // Always refetch after error or success:
       onSettled: () => {
         queryClient.invalidateQueries('boards');
@@ -98,11 +74,16 @@ const useAddBoard = () => {
 };
 
 // Edit board
-const useEditBoard = () => {
+export const useEditBoard = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ boardId, title, bgColor }: newBoardObject & { boardId: string }) => {
-      return editBoard(boardId, title, bgColor);
+    ({
+      boardId,
+      userId,
+      title,
+      bgColor,
+    }: newBoardObject & { boardId: string }) => {
+      return editBoard(boardId, userId, title, bgColor);
     },
     {
       onMutate: async ({ boardId, title, bgColor }) => {
@@ -133,21 +114,15 @@ const useEditBoard = () => {
         queryClient.invalidateQueries('boards');
       },
     },
-    // {
-    //   onSuccess: () => {
-    //     // ✅ refetch boards after mutation is successfull
-    //     queryClient.invalidateQueries(['boards']);
-    //   },
-    // },
   );
 };
 
 // Delete board
-const useDeleteBoard = () => {
+export const useDeleteBoard = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    (boardId: string) => {
-      return deleteBoard(boardId);
+    ({ userId, boardId }: UserId & { boardId: string }) => {
+      return deleteBoard(userId, boardId);
     },
     {
       onMutate: async (boardId) => {
@@ -178,20 +153,22 @@ const useDeleteBoard = () => {
 };
 
 // Get Lists per board
-const useListsPerBoard = (boardId: string) => {
-  return useQuery<DocumentData[]>(['lists'], () => getListsPerBoard(boardId));
+export const useListsPerBoard = (userId: string, boardId: string) => {
+  return useQuery<DocumentData[]>(['lists'], () =>
+    getListsPerBoard(userId, boardId),
+  );
 };
 
 // Add List
-const useAddList = () => {
+export const useAddList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ title, boardId }: newListObject) => {
-      return addList(title, boardId);
+    ({ title, userId, boardId }: newListObject) => {
+      return addList(title, userId, boardId);
     },
     {
       // When mutate is called:
-      onMutate: async ({ title, boardId }: newListObject) => {
+      onMutate: async ({ title, boardId }) => {
         // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
         await queryClient.cancelQueries('lists');
 
@@ -209,14 +186,14 @@ const useAddList = () => {
         return { previousLists };
       },
       // If the mutation fails, use the context returned from onMutate to roll back
-      onError: (err, variables, context) => {
-        if (context?.previousLists) {
-          queryClient.setQueryData<DocumentData[]>(
-            'lists',
-            context.previousLists,
-          );
-        }
-      },
+      // onError: (err, variables, context) => {
+      //   if (context?.previousLists) {
+      //     queryClient.setQueryData<DocumentData[]>(
+      //       'lists',
+      //       context.previousLists,
+      //     );
+      //   }
+      // },
       // Always refetch after error or success:
       onSettled: () => {
         queryClient.invalidateQueries('lists');
@@ -226,11 +203,16 @@ const useAddList = () => {
 };
 
 // Edit List
-const useEditList = () => {
+export const useEditList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ title, boardId, listId }: newListObject & { listId: string }) => {
-      return editList(title, listId, boardId);
+    ({
+      title,
+      userId,
+      boardId,
+      listId,
+    }: newListObject & { listId: string }) => {
+      return editList(title, listId, boardId, userId);
     },
     {
       onSuccess: () => {
@@ -242,11 +224,11 @@ const useEditList = () => {
 };
 
 // Delete List
-const useDeleteList = () => {
+export const useDeleteList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ listId, boardId }: newListObject & { listId: string }) => {
-      return deleteList(listId, boardId);
+    ({ listId, boardId, userId }: newListObject & { listId: string }) => {
+      return deleteList(listId, boardId, userId);
     },
     {
       onMutate: async (listId) => {
@@ -273,13 +255,13 @@ const useDeleteList = () => {
 };
 
 // Add List
-const useAddCard = () => {
+export const useAddCard = () => {
   const queryClient = useQueryClient();
   // Get ID
 
   return useMutation(
-    ({ textContent, listId, boardId }: newCardObject) => {
-      return addCard(textContent, listId, boardId);
+    ({ textContent, listId, boardId, userId }: newCardObject) => {
+      return addCard(textContent, listId, boardId, userId);
     },
     {
       onMutate: async ({ textContent, listId }) => {
@@ -308,7 +290,7 @@ const useAddCard = () => {
 };
 
 // Edit List
-const useEditCard = () => {
+export const useEditCard = () => {
   const queryClient = useQueryClient();
   return useMutation(
     ({
@@ -316,8 +298,9 @@ const useEditCard = () => {
       textContent,
       listId,
       boardId,
+      userId,
     }: newCardObject & { cardId: number }) => {
-      return editCard(cardId, textContent, listId, boardId);
+      return editCard(cardId, textContent, listId, boardId, userId);
     },
     {
       onSuccess: () => {
@@ -329,11 +312,11 @@ const useEditCard = () => {
 };
 
 // Delete Card
-const useDeleteCard = () => {
+export const useDeleteCard = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ textContent, listId, boardId }: newCardObject) => {
-      return deleteCard(textContent, listId, boardId);
+    ({ textContent, listId, boardId, userId }: newCardObject) => {
+      return deleteCard(textContent, listId, boardId, userId);
     },
     {
       onSuccess: () => {
@@ -345,11 +328,11 @@ const useDeleteCard = () => {
 };
 
 // Drag cards in the same list
-const useDragCardsInSameList = () => {
+export const useDragCardsInSameList = () => {
   const queryClient = useQueryClient();
   return useMutation(
-    ({ cards, listId, boardId }: dragCardsObject) => {
-      return dragCardsInSameList({ cards, listId, boardId });
+    ({ cards, listId, boardId, userId }: dragCardsObject) => {
+      return dragCardsInSameList({ cards, listId, boardId, userId });
     },
     {
       onMutate: async ({ cards, listId }) => {
@@ -382,7 +365,7 @@ const useDragCardsInSameList = () => {
   );
 };
 
-const useDragCardsBetweenList = () => {
+export const useDragCardsBetweenList = () => {
   const queryClient = useQueryClient();
   return useMutation(
     ({
@@ -391,6 +374,7 @@ const useDragCardsBetweenList = () => {
       sourceListId,
       destListId,
       boardId,
+      userId,
     }: dragCardsBetweenObject) => {
       return dragCardsBetweenList({
         sourceCards,
@@ -398,6 +382,7 @@ const useDragCardsBetweenList = () => {
         sourceListId,
         destListId,
         boardId,
+        userId,
       });
     },
     {
@@ -433,22 +418,4 @@ const useDragCardsBetweenList = () => {
       },
     },
   );
-};
-
-export {
-  useAddNewUser,
-  useBoards,
-  useCachedBoards,
-  useAddBoard,
-  useEditBoard,
-  useDeleteBoard,
-  useListsPerBoard,
-  useAddList,
-  useEditList,
-  useDeleteList,
-  useAddCard,
-  useEditCard,
-  useDeleteCard,
-  useDragCardsInSameList,
-  useDragCardsBetweenList,
 };
