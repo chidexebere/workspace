@@ -231,7 +231,11 @@ export const dragCardsBetweenList = async ({
     { merge: true },
   );
 
-  const docDestRef = doc(db, `boards/${boardId}/lists`, destListId);
+  const docDestRef = doc(
+    db,
+    `users/${userId}/boards/${boardId}/lists`,
+    destListId,
+  );
   await setDoc(
     docDestRef,
     {
