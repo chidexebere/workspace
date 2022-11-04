@@ -16,7 +16,6 @@ const Modal = ({ isOpen, handleClick, title, children }: Props) => {
     <div
       className={modalClass}
       id="Modal"
-      // tabIndex="-1"
       aria-labelledby="ModalTitle"
       aria-modal="true"
       role="dialog"

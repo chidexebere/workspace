@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDeleteCard, useEditCard } from '../../api/hooks';
+import { useDeleteCard, useEditCard } from '../../firebase/db/hooks';
 import Button from '../Button';
 import { inputClass } from '../List';
 import Modal from '../Modal';
@@ -86,6 +86,7 @@ interface EditCardProps {
   toggleOpenCardModal: () => void;
   listId: string;
   boardId: string;
+  userId: string;
 }
 const EditCard = ({
   textContent,
@@ -94,6 +95,7 @@ const EditCard = ({
   toggleOpenCardModal,
   listId,
   boardId,
+  userId,
 }: EditCardProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showShareLink, setShowShareLink] = useState(false);
@@ -119,7 +121,7 @@ const EditCard = ({
   ) => {
     e.preventDefault();
     // const filteredCards = cards.filter((card) => card.id !== cardId);
-    deleteCard.mutate({ textContent, listId, boardId });
+    deleteCard.mutate({ textContent, listId, boardId, userId });
     // setCards(filteredCards);
     toggleDeleteModal();
     toggleOpenCardModal();
@@ -227,8 +229,9 @@ interface CardProps {
   textContent: string;
   cardId: number;
   listId: string;
+  userId: string;
 }
-const Card = ({ textContent, cardId, listId }: CardProps) => {
+const Card = ({ textContent, cardId, listId, userId }: CardProps) => {
   const [showOpenCardModal, setShowOpenCardModal] = useState(false);
   const [newTextContent, setNewTextContent] = useState(textContent);
   const [enteredTextContent, setEnteredTextContent] = useState('');
@@ -265,6 +268,7 @@ const Card = ({ textContent, cardId, listId }: CardProps) => {
         textContent: enteredTextContent,
         listId,
         boardId,
+        userId,
       });
       setNewTextContent(enteredTextContent);
     }
@@ -285,6 +289,7 @@ const Card = ({ textContent, cardId, listId }: CardProps) => {
           handleSubmit={handleEditCard}
           listId={listId}
           boardId={boardId}
+          userId={userId}
         />
       </Modal>
 

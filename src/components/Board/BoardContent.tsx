@@ -5,14 +5,15 @@ import {
   useDragCardsInSameList,
   useDragCardsBetweenList,
   useListsPerBoard,
-} from '../../api/hooks';
+} from '../../firebase/db/hooks';
 
 interface Props {
+  userId: string;
   boardId: string;
   boardBgColor: string;
 }
-const BoardContent = ({ boardId, boardBgColor }: Props) => {
-  const { isLoading, data: lists } = useListsPerBoard(boardId as string);
+const BoardContent = ({ userId, boardId, boardBgColor }: Props) => {
+  const { isLoading, data: lists } = useListsPerBoard(userId, boardId);
 
   const dragCardsInSameList = useDragCardsInSameList();
   const dragCardsBetweenList = useDragCardsBetweenList();
@@ -36,6 +37,7 @@ const BoardContent = ({ boardId, boardBgColor }: Props) => {
         cards: cardsCopy,
         listId: source.droppableId,
         boardId,
+        userId,
       });
     }
 
@@ -57,6 +59,7 @@ const BoardContent = ({ boardId, boardBgColor }: Props) => {
         sourceListId: source.droppableId,
         destListId: destination.droppableId,
         boardId,
+        userId,
       });
     }
   };
@@ -74,12 +77,13 @@ const BoardContent = ({ boardId, boardBgColor }: Props) => {
               key={list.id}
               title={list.title}
               listId={list.id}
+              userId={userId}
               boardId={boardId}
               bgColor={boardBgColor}
               cards={list.cards}
             />
           ))}
-          <CreateList boardId={boardId} />
+          <CreateList userId={userId} boardId={boardId} />
         </div>
       )}
     </DragDropContext>

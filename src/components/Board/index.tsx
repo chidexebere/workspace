@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../Button';
 import { CheckIcon, TrashIcon, PencilIcon } from '@heroicons/react/solid';
 import Modal from '../Modal';
-import { useDeleteBoard, useEditBoard } from '../../api/hooks';
+import { useDeleteBoard, useEditBoard } from '../../firebase/db/hooks';
 
 interface BoardCoverProps {
   bgColor: string;
@@ -156,10 +156,17 @@ interface BoardProps {
   title: string;
   bgColor: string;
   titleTextColor: string;
+  userId: string;
   boardId: string;
 }
 
-const Board = ({ bgColor, title, titleTextColor, boardId }: BoardProps) => {
+const Board = ({
+  bgColor,
+  title,
+  titleTextColor,
+  userId,
+  boardId,
+}: BoardProps) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
@@ -216,15 +223,26 @@ const Board = ({ bgColor, title, titleTextColor, boardId }: BoardProps) => {
   ) => {
     e.preventDefault();
     if (inputTitle !== newTitle) {
-      editBoard.mutate({ boardId, title: inputTitle, bgColor: newBgColor });
+      editBoard.mutate({
+        userId,
+        boardId,
+        title: inputTitle,
+        bgColor: newBgColor,
+      });
       setNewTitle(inputTitle);
     }
     if (selectedBgColor !== newBgColor) {
-      editBoard.mutate({ boardId, title: newTitle, bgColor: selectedBgColor });
+      editBoard.mutate({
+        userId,
+        boardId,
+        title: newTitle,
+        bgColor: selectedBgColor,
+      });
       setNewBgColor(selectedBgColor);
     }
     if (inputTitle !== newTitle && selectedBgColor !== newBgColor) {
       editBoard.mutate({
+        userId,
         boardId,
         title: inputTitle,
         bgColor: selectedBgColor,
@@ -239,7 +257,7 @@ const Board = ({ bgColor, title, titleTextColor, boardId }: BoardProps) => {
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
-    deleteBoard.mutate(boardId);
+    deleteBoard.mutate({ userId, boardId });
     toggleDeleteModal();
   };
 

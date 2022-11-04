@@ -3,10 +3,11 @@ import { Card, CardContainer } from '.';
 
 interface CardListProps {
   listId: string;
+  userId: string;
   cards: string[];
 }
 
-const CardList = ({ listId, cards }: CardListProps) => {
+const CardList = ({ listId, userId, cards }: CardListProps) => {
   return (
     <Droppable droppableId={`${listId}`} type="card">
       {(provided) => (
@@ -24,7 +25,12 @@ const CardList = ({ listId, cards }: CardListProps) => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                   >
-                    <Card textContent={card} cardId={index} listId={listId} />
+                    <Card
+                      textContent={card}
+                      cardId={index}
+                      listId={listId}
+                      userId={userId}
+                    />
                   </div>
                 )}
               </Draggable>

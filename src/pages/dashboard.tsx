@@ -1,21 +1,21 @@
 import Layout from '../layout';
 import BoardList from '../components/Board/BoardList';
-import { useBoards } from '../api/hooks';
+import { useAuth } from '../firebase/auth/context';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const Dashboard = () => {
-  // const { isLoading, isError, data } = useBoards(true);
+  const { authUser, isLoading: isLoadingUser } = useAuth();
+  const navigate = useNavigate();
 
-  const { isLoading, isError, data } = useBoards();
+  // Listen for changes to loading and authUser, redirect if needed
+  useEffect(() => {
+    if (!isLoadingUser && !authUser) {
+      navigate('/');
+    }
+  }, [authUser, isLoadingUser]);
 
-  if (isError) {
-    return <div>An error occured</div>;
-  }
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  return <Layout>{data && <BoardList boards={data} />}</Layout>;
+  return <Layout>{authUser && <BoardList user={authUser} />}</Layout>;
 };
 
 export default Dashboard;

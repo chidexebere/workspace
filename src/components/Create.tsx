@@ -5,9 +5,9 @@ import { AddList, EditListHeader } from './List';
 import { AddBoard, EditBoard } from './Board';
 import Modal from './Modal';
 import { AddCard, AddCardForm } from './Card';
-import { useAddBoard, useAddCard, useAddList } from '../api/hooks';
+import { useAddBoard, useAddCard, useAddList } from '../firebase/db/hooks';
 
-const CreateBoard = () => {
+const CreateBoard = ({ userId }: UserId) => {
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState('');
   const [bgColor, setBgColor] = useState('');
@@ -40,7 +40,7 @@ const CreateBoard = () => {
   ) => {
     e.preventDefault();
     if (title && bgColor) {
-      const newBoard = { title, bgColor };
+      const newBoard = { userId, title, bgColor };
       addNewBoard.mutate(newBoard);
     }
     setTitle('');
@@ -68,9 +68,10 @@ const CreateBoard = () => {
 };
 
 interface CreateListProps {
+  userId: string;
   boardId: string;
 }
-const CreateList = ({ boardId }: CreateListProps) => {
+const CreateList = ({ userId, boardId }: CreateListProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState('');
 
@@ -90,7 +91,7 @@ const CreateList = ({ boardId }: CreateListProps) => {
   ) => {
     e.preventDefault();
     if (title) {
-      const newList = { title, boardId };
+      const newList = { title, userId, boardId };
       addNewList.mutate(newList);
     }
     setTitle('');
@@ -121,8 +122,9 @@ const CreateList = ({ boardId }: CreateListProps) => {
 interface CreateCardProps {
   listId: string;
   boardId: string;
+  userId: string;
 }
-const CreateCard = ({ listId, boardId }: CreateCardProps) => {
+const CreateCard = ({ listId, boardId, userId }: CreateCardProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [textContent, setTextContent] = useState('');
 
@@ -142,7 +144,7 @@ const CreateCard = ({ listId, boardId }: CreateCardProps) => {
   ) => {
     e.preventDefault();
     if (textContent) {
-      const newCard = { textContent, listId, boardId };
+      const newCard = { textContent, listId, boardId, userId };
       addCard.mutate(newCard);
     }
     setTextContent('');

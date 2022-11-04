@@ -5,7 +5,7 @@ import { TrashIcon } from '@heroicons/react/solid';
 import Button from '../Button';
 import Modal from '../Modal';
 import CardList from '../Card/CardList';
-import { useDeleteList, useEditList } from '../../api/hooks';
+import { useDeleteList, useEditList } from '../../firebase/db/hooks';
 
 interface ListContainerProps {
   children: React.ReactNode;
@@ -128,11 +128,18 @@ interface ListProps {
   title: string;
   bgColor: string;
   listId: string;
+  userId: string;
   boardId: string;
-  // lists: DocumentData[];
   cards: string[];
 }
-const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
+const List = ({
+  title,
+  bgColor,
+  listId,
+  userId,
+  boardId,
+  cards,
+}: ListProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
   const [showModal, setShowModal] = useState(false);
@@ -163,7 +170,7 @@ const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
   ) => {
     e.preventDefault();
     if (newTitle) {
-      editList.mutate({ title: newTitle, listId, boardId });
+      editList.mutate({ title: newTitle, listId, userId, boardId });
     }
     setIsEditing(false);
   };
@@ -172,7 +179,7 @@ const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
-    deleteList.mutate({ title: '', listId, boardId });
+    deleteList.mutate({ title: '', listId, userId, boardId });
     toggleModal();
   };
 
@@ -195,9 +202,9 @@ const List = ({ title, bgColor, listId, boardId, cards }: ListProps) => {
         )}
       </div>
 
-      {<CardList listId={listId} cards={cards} />}
+      {<CardList listId={listId} cards={cards} userId={userId} />}
 
-      <CreateCard listId={listId} boardId={boardId} />
+      <CreateCard listId={listId} boardId={boardId} userId={userId} />
 
       <Modal title="Delete List" isOpen={showModal} handleClick={toggleModal}>
         <DeleteList toggleModal={toggleModal} handleSubmit={handleDeleteList} />
