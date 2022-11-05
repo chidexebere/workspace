@@ -1,7 +1,6 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
-// import { useLogout } from '../firebase/db/hooks';
 import { useAuth } from '../firebase/auth/context';
 
 interface LayoutProps {
@@ -9,34 +8,24 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  // const navigate = useNavigate();
-  // const { mutate } = useLogout();
-  const { signOut } = useAuth();
+  const { authUser, signOut, deleteAuthUser } = useAuth();
 
   const location = useLocation();
   const boardsPath = '/boards';
   let footer;
 
   location.pathname === boardsPath && (footer = <Footer />);
-  const addedClass =
-    location.pathname === boardsPath
-      ? `h-full min-h-[calc(100vh-10rem)]`
-      : `h-[calc(100vh-8rem)]`;
-
-  // const handleLogout = () => {
-  //   mutate(undefined, {
-  //     onSuccess: () => navigate('/'),
-  //   });
-  // };
 
   return (
-    <>
-      <Header handleLogout={signOut} />
-      <main className={`relative top-20  p-4 sm:p-8 md:p-10 ${addedClass}`}>
-        {children}
-      </main>
+    <div className="bg-teal-50 min-h-screen">
+      <Header
+        signOut={signOut}
+        user={authUser}
+        deleteAuthUser={deleteAuthUser}
+      />
+      <main className={`p-4 sm:p-8 md:p-10 mb-12`}>{children}</main>
       {footer}
-    </>
+    </div>
   );
 };
 
