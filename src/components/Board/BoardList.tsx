@@ -22,7 +22,10 @@ const BoardList = ({ user }: Props) => {
   return (
     <>
       <h2 className="font-medium leading-tight text-3xl mt-0 mb-8 text-blue-600">
-        Hello {user.displayName ? user.displayName.split(' ')[0] : ''},
+        {user.displayName
+          ? `Hello ${user.displayName.split(' ')[0]}`
+          : 'Welcome Guest'}
+        ,
       </h2>
       <Breadcrumb>
         <li className="">Dashboard</li>

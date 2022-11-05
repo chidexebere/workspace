@@ -6,6 +6,7 @@ import {
   useDragCardsBetweenList,
   useListsPerBoard,
 } from '../../firebase/db/hooks';
+import Loading from '../../pages/loading';
 
 interface Props {
   userId: string;
@@ -65,7 +66,7 @@ const BoardContent = ({ userId, boardId, boardBgColor }: Props) => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading>Loading board content...</Loading>;
   }
 
   return (

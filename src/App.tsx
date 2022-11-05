@@ -9,7 +9,7 @@ function App() {
   return (
     <AuthUserProvider>
       <Router>
-        <div className="App bg-teal-50">
+        <div className="">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="boards" element={<Dashboard />} />

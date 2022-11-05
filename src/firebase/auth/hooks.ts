@@ -3,6 +3,7 @@ import {
   onAuthStateChanged,
   signOut as authSignOut,
   User,
+  deleteUser as authDeleteUser,
 } from 'firebase/auth';
 import { auth } from '../firebase.config';
 import { addNewUserIfNotFound } from '../db';
@@ -43,6 +44,15 @@ export const useFirebaseAuth = () => {
     }
   };
 
+  const deleteAuthUser = async () => {
+    const currentuser = auth.currentUser as User;
+    try {
+      await authDeleteUser(currentuser);
+    } catch (e) {
+      console.error('Error deleting user: ', e);
+    }
+  };
+
   // Listen for Firebase Auth state change
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, authStateChanged);
@@ -53,6 +63,7 @@ export const useFirebaseAuth = () => {
     authUser,
     isLoading,
     signOut,
+    deleteAuthUser,
   };
 };
 

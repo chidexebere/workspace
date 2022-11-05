@@ -5,15 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
 const Dashboard = () => {
-  const { authUser, isLoading: isLoadingUser } = useAuth();
+  const { authUser, isLoading } = useAuth();
   const navigate = useNavigate();
 
   // Listen for changes to loading and authUser, redirect if needed
   useEffect(() => {
-    if (!isLoadingUser && !authUser) {
+    if (!isLoading && !authUser) {
       navigate('/');
     }
-  }, [authUser, isLoadingUser]);
+  }, [authUser, isLoading]);
 
   return <Layout>{authUser && <BoardList user={authUser} />}</Layout>;
 };

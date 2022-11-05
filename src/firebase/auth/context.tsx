@@ -10,10 +10,12 @@ export const AuthUserContext = createContext<{
   authUser: AuthUser | null;
   isLoading: boolean;
   signOut: () => Promise<void>;
+  deleteAuthUser: () => Promise<void>;
 }>({
   authUser: null,
   isLoading: true,
   signOut: async () => undefined,
+  deleteAuthUser: async () => undefined,
 });
 
 export const AuthUserProvider = ({ children }: Props) => {

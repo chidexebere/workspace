@@ -36,6 +36,10 @@ export const addNewUserIfNotFound = async (user: User) => {
   }
 };
 
+export const deleteUserData = async (userId: string) => {
+  await deleteDoc(doc(db, 'users', userId));
+};
+
 // Boards
 export const getBoards = async (userId: string) => {
   const q = query(

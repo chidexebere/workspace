@@ -1,6 +1,5 @@
 import { EmailAuthProvider, GoogleAuthProvider } from 'firebase/auth';
 import { useEffect, useState } from 'react';
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import { useNavigate } from 'react-router-dom';
 import { useSignInAnon } from '../firebase/auth/hooks';
 import KanbanBoardImage from '../assets/images/kanban-board.png';
@@ -8,6 +7,7 @@ import Modal from '../components/Modal';
 import { useAuth } from '../firebase/auth/context';
 import { auth } from '../firebase/firebase.config';
 import Loading from './loading';
+import StyledFirebaseAuth from '../firebase/auth/StyledFirebaseAuth';
 
 const REDIRECT_PAGE = '/boards';
 
@@ -45,8 +45,8 @@ const Home = () => {
   return isLoading || (!isLoading && !!authUser) ? (
     <Loading>Loading...</Loading>
   ) : (
-    <section className="flex flex-col lg:flex-row ">
-      <div className="flex-1 w-full lg:w-1/2 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
+    <section className="flex flex-col lg:flex-row justify-center">
+      <div className="w-full lg:w-1/2 lg:max-w-2xl pb-8 bg-white sm:pb-16 md:pb-20 lg:pb-28 xl:pb-32">
         <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
           <div className="sm:text-center lg:text-left">
             <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
@@ -74,12 +74,22 @@ const Home = () => {
         </main>
       </div>
 
-      <div className="flex-1 w-full h-full lg:w-1/2 ">
+      <div
+        className="w-full h-full lg:w-1/2 "
+        // style={{
+        //   backgroundImage: `url(${
+        //     process.env.PUBLIC_URL + '/kanban-board.png'
+        //   })`,
+        //   height: '800px',
+        //   backgroundRepeat: 'no-repeat',
+        //   backgroundSize: 'cover',
+        // }}
+      >
         <img
           src={KanbanBoardImage}
           loading="lazy"
-          width="700"
-          height="600"
+          // width="700"
+          // height="600"
           alt="Kanban board image"
         />
       </div>
