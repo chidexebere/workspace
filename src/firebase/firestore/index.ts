@@ -128,8 +128,8 @@ export const addList = async (
 export const editList = async (
   title: string,
   listId: string,
-  userId: string,
   boardId: string,
+  userId: string,
 ) => {
   const docRef = doc(db, `users/${userId}/boards/${boardId}/lists`, listId);
   await updateDoc(docRef, {

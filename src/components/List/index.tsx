@@ -170,7 +170,7 @@ const List = ({
   ) => {
     e.preventDefault();
     if (newTitle) {
-      editList.mutate({ title: newTitle, listId, userId, boardId });
+      editList.mutate({ title: newTitle, listId, boardId, userId });
     }
     setIsEditing(false);
   };

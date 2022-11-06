@@ -78,12 +78,12 @@ export const useEditBoard = () => {
   const queryClient = useQueryClient();
   return useMutation(
     ({
-      boardId,
       userId,
+      boardId,
       title,
       bgColor,
     }: newBoardObject & { boardId: string }) => {
-      return editBoard(boardId, userId, title, bgColor);
+      return editBoard(userId, boardId, title, bgColor);
     },
     {
       onMutate: async ({ boardId, title, bgColor }) => {
@@ -208,9 +208,9 @@ export const useEditList = () => {
   return useMutation(
     ({
       title,
-      userId,
-      boardId,
       listId,
+      boardId,
+      userId,
     }: newListObject & { listId: string }) => {
       return editList(title, listId, boardId, userId);
     },
