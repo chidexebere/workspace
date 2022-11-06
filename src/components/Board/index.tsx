@@ -14,7 +14,7 @@ interface BoardCoverProps {
 
 const BoardCover = ({ bgColor, children, onClick }: BoardCoverProps) => {
   const defaultClass =
-    'block p-6 rounded h-24 w-full sm:max-w-xs cursor-pointer flex';
+    'block p-6 rounded h-24 w-full md:max-w-xs cursor-pointer flex';
 
   const boardClass = bgColor ? `${bgColor} ${defaultClass}` : `${defaultClass}`;
 

@@ -17,7 +17,7 @@ const Layout = ({ children }: LayoutProps) => {
   location.pathname === boardsPath && (footer = <Footer />);
 
   return (
-    <div className="bg-teal-50 min-h-screen">
+    <div className="min-h-screen bg-gradient-to-r from-blue-100 to-teal-100 ">
       <Header
         signOut={signOut}
         user={authUser}

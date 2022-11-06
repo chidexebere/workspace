@@ -31,7 +31,7 @@ const BoardList = ({ user }: Props) => {
         <li className="">Dashboard</li>
       </Breadcrumb>
 
-      <div className="mt-10 grid grid-cols-1 gap-y-12 gap-x-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-10 flex flex-wrap flex-col gap-y-10 gap-x-6 md:flex-row ">
         {boards?.map((board) => (
           <Board
             key={board.id}
