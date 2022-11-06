@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import Avatar from '../components/Avatar';
-import { deleteUserData } from '../firebase/db';
+import { deleteUserData } from '../firebase/firestore';
 
 interface HeaderProps {
   signOut: () => void;

@@ -5,7 +5,7 @@ import { TrashIcon } from '@heroicons/react/solid';
 import Button from '../Button';
 import Modal from '../Modal';
 import CardList from '../Card/CardList';
-import { useDeleteList, useEditList } from '../../firebase/db/hooks';
+import { useDeleteList, useEditList } from '../../firebase/firestore/hooks';
 
 interface ListContainerProps {
   children: React.ReactNode;

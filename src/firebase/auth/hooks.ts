@@ -6,7 +6,7 @@ import {
   deleteUser as authDeleteUser,
 } from 'firebase/auth';
 import { auth } from '../firebase.config';
-import { addNewUserIfNotFound } from '../db';
+import { addNewUserIfNotFound } from '../firestore';
 import { useMutation, useQueryClient } from 'react-query';
 import { signInAnon } from '.';
 

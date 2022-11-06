@@ -1,5 +1,5 @@
 import { Board } from '.';
-import { useBoards } from '../../firebase/db/hooks';
+import { useBoards } from '../../firebase/firestore/hooks';
 import Loading from '../../pages/loading';
 import Breadcrumb from '../Breadcrumb';
 import { CreateBoard } from '../Create';

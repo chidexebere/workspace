@@ -5,7 +5,11 @@ import { AddList, EditListHeader } from './List';
 import { AddBoard, EditBoard } from './Board';
 import Modal from './Modal';
 import { AddCard, AddCardForm } from './Card';
-import { useAddBoard, useAddCard, useAddList } from '../firebase/db/hooks';
+import {
+  useAddBoard,
+  useAddCard,
+  useAddList,
+} from '../firebase/firestore/hooks';
 
 const CreateBoard = ({ userId }: UserId) => {
   const [showModal, setShowModal] = useState(false);

@@ -5,7 +5,7 @@ import {
   useDragCardsInSameList,
   useDragCardsBetweenList,
   useListsPerBoard,
-} from '../../firebase/db/hooks';
+} from '../../firebase/firestore/hooks';
 import Loading from '../../pages/loading';
 
 interface Props {

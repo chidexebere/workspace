@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-import { useBoards, useCachedBoards } from '../../firebase/db/hooks';
+import { useBoards, useCachedBoards } from '../../firebase/firestore/hooks';
 import Breadcrumb from '../Breadcrumb';
 import BoardContent from './BoardContent';
 

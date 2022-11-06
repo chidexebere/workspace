@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDeleteCard, useEditCard } from '../../firebase/db/hooks';
+import { useDeleteCard, useEditCard } from '../../firebase/firestore/hooks';
 import Button from '../Button';
 import { inputClass } from '../List';
 import Modal from '../Modal';

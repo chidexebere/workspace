@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../Button';
 import { CheckIcon, TrashIcon, PencilIcon } from '@heroicons/react/solid';
 import Modal from '../Modal';
-import { useDeleteBoard, useEditBoard } from '../../firebase/db/hooks';
+import { useDeleteBoard, useEditBoard } from '../../firebase/firestore/hooks';
 
 interface BoardCoverProps {
   bgColor: string;
