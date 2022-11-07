@@ -19,7 +19,7 @@ const Header = ({ signOut, user, deleteAuthUser }: HeaderProps) => {
     }
   };
   return (
-    <header className="sticky top-0">
+    <header className="sticky top-0 h-20">
       <nav className="flex items-center justify-between bg-teal-500 p-4">
         <Link to="/">
           <h1 className="md:ml-8 font-semibold text-3xl uppercase tracking-tight text-slate-100 hover:text-white">

@@ -72,7 +72,7 @@ const BoardContent = ({ userId, boardId, boardBgColor }: Props) => {
   return (
     <DragDropContext onDragEnd={handleOnDragEnd}>
       {lists && (
-        <div className="mt-10 grid grid-flow-col overflow-x-auto h-full items-start auto-cols-220 gap-x-2 md:auto-cols-270 md:gap-x-4">
+        <div className="mt-10 grid grid-flow-col overflow-x-auto min-h-[calc(100vh-15rem)] items-start auto-cols-220 gap-x-2 md:auto-cols-270 md:gap-x-4">
           {lists.map((list) => (
             <List
               key={list.id}

@@ -16,14 +16,19 @@ const Layout = ({ children }: LayoutProps) => {
 
   location.pathname === boardsPath && (footer = <Footer />);
 
+  const addedClass =
+    location.pathname === boardsPath
+      ? `min-h-[calc(100%-10rem)]`
+      : `min-h-[calc(100vh-5rem)]`;
+
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-100 to-teal-100 ">
+    <div className="md:h-screen bg-gradient-to-r from-blue-100 to-teal-100 ">
       <Header
         signOut={signOut}
         user={authUser}
         deleteAuthUser={deleteAuthUser}
       />
-      <main className={`p-4 sm:p-8 md:p-10 mb-12`}>{children}</main>
+      <main className={`p-4 sm:p-8 md:p-10 ${addedClass} `}>{children}</main>
       {footer}
     </div>
   );
