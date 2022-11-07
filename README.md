@@ -1,7 +1,7 @@
 # WorkSpace
 
 A simple Kanban board implementation used to plan personal and work projects.
-[Website](https://)
+[Website](https://workspace-api-2810a.web.app)
 
 ## Features
 
@@ -44,8 +44,8 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 ## Technologies used
 
 - React and TypeScript: used to build the UI components
-- Styled components and SASS: for styling
-- React Query: for managing server state
-- React testing library and MSW : for unit and integration tests
-- Cypress : for end-to-end tests
+- Firebase for backend services; Firestore, Authentication and Hosting
+- Tailwind for general styles.
+- Firebase UI for Sign -in UI.
+- React Query: for managing server state and React Context for local state
 - Eslint for linting and Prettier for code formating
