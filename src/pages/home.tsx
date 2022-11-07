@@ -74,24 +74,8 @@ const Home = () => {
         </main>
       </div>
 
-      <div
-        className="w-full h-full lg:w-1/2 "
-        // style={{
-        //   backgroundImage: `url(${
-        //     process.env.PUBLIC_URL + '/kanban-board.png'
-        //   })`,
-        //   height: '800px',
-        //   backgroundRepeat: 'no-repeat',
-        //   backgroundSize: 'cover',
-        // }}
-      >
-        <img
-          src={KanbanBoardImage}
-          loading="lazy"
-          // width="700"
-          // height="600"
-          alt="Kanban board image"
-        />
+      <div className="w-full h-full lg:w-1/2 ">
+        <img src={KanbanBoardImage} loading="lazy" alt="Kanban board image" />
       </div>
       <Modal
         isOpen={login}

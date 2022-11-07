@@ -57,14 +57,14 @@ export const useAddBoard = () => {
         return { previousBoards };
       },
       // If the mutation fails, use the context returned from onMutate to roll back
-      // onError: (err, variables, context) => {
-      //   if (context?.previousBoards !== undefined) {
-      //     queryClient.setQueryData<DocumentData[]>(
-      //       'boards',
-      //       context.previousBoards,
-      //     );
-      //   }
-      // },
+      onError: (err, variables, context) => {
+        if (context?.previousBoards !== undefined) {
+          queryClient.setQueryData<DocumentData[]>(
+            'boards',
+            context.previousBoards,
+          );
+        }
+      },
       // Always refetch after error or success:
       onSettled: () => {
         queryClient.invalidateQueries('boards');
@@ -186,14 +186,14 @@ export const useAddList = () => {
         return { previousLists };
       },
       // If the mutation fails, use the context returned from onMutate to roll back
-      // onError: (err, variables, context) => {
-      //   if (context?.previousLists) {
-      //     queryClient.setQueryData<DocumentData[]>(
-      //       'lists',
-      //       context.previousLists,
-      //     );
-      //   }
-      // },
+      onError: (err, variables, context) => {
+        if (context?.previousLists) {
+          queryClient.setQueryData<DocumentData[]>(
+            'lists',
+            context.previousLists,
+          );
+        }
+      },
       // Always refetch after error or success:
       onSettled: () => {
         queryClient.invalidateQueries('lists');
@@ -257,7 +257,6 @@ export const useDeleteList = () => {
 // Add List
 export const useAddCard = () => {
   const queryClient = useQueryClient();
-  // Get ID
 
   return useMutation(
     ({ textContent, listId, boardId, userId }: newCardObject) => {
@@ -356,11 +355,6 @@ export const useDragCardsInSameList = () => {
       onSettled: () => {
         queryClient.invalidateQueries('lists');
       },
-
-      // onSuccess: () => {
-      //   // ✅ refetch cards after mutation is successfull
-      //   queryClient.invalidateQueries(['lists']);
-      // },
     },
   );
 };

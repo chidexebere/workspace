@@ -112,17 +112,11 @@ const EditCard = ({
     setShowShareLink(!showShareLink);
   };
 
-  const handleOnChange = () => {
-    console.log('change done');
-  };
-
   const handleDeleteCard = (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.preventDefault();
-    // const filteredCards = cards.filter((card) => card.id !== cardId);
     deleteCard.mutate({ textContent, listId, boardId, userId });
-    // setCards(filteredCards);
     toggleDeleteModal();
     toggleOpenCardModal();
   };
@@ -157,7 +151,6 @@ const EditCard = ({
               placeholder=""
               autoFocus={true}
               value={`http://localhost:3000/boards/${id}`}
-              onChange={handleOnChange}
             />
           )}
           <Button

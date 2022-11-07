@@ -2,11 +2,6 @@ type Params = {
   id: string;
 };
 
-type Timestamp = {
-  seconds: number;
-  nanoseconds: number;
-};
-
 type UserId = {
   userId: string;
 };
@@ -46,23 +41,8 @@ type dragCardsBetweenObject = {
   userId: string;
 };
 
-type newUser = {
-  fullname: string;
-  email: string;
-  password: string;
-};
-
 type AuthUser = {
   uid: string;
   email: string | null;
   displayName: string | null;
 };
-
-type newLogin = {
-  email: string;
-  password: string;
-};
-
-type newUserObject = newUser | undefined;
-
-type newLoginObject = newlogin | undefined;
