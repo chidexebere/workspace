@@ -9,7 +9,7 @@ A simple Kanban board implementation used to plan personal and work projects.
 - Add mutiple boards, lists and tickets.
 - Reorder tickets on different lists
 
-## Screenshoots
+## Screenshots
 
 1. Displays home page with signin buttons.
    ![home page with signin buttons](./screenshots/WS1.png)
@@ -44,8 +44,8 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 ## Technologies used
 
 - React and TypeScript: used to build the UI components
-- Firebase for backend services; Firestore, Authentication and Hosting
+- Firebase for backend services; Cloud Firestore, Firebase Authentication and Firebase Hosting
 - Tailwind for general styles.
-- Firebase UI for Sign -in UI.
+- Firebase UI for sign-in UI.
 - React Query: for managing server state and React Context for local state
 - Eslint for linting and Prettier for code formating
