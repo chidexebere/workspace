@@ -5,6 +5,7 @@ import Button from '../Button';
 import { CheckIcon, TrashIcon, PencilIcon } from '@heroicons/react/solid';
 import Modal from '../Modal';
 import { useDeleteBoard, useEditBoard } from '../../firebase/firestore/hooks';
+import Confirm from '../Confirm';
 
 interface BoardCoverProps {
   bgColor: string;
@@ -51,34 +52,6 @@ const AddBoard = ({ handleClick }: AddBoardProps) => {
     <BoardCover bgColor="bg-slate-100" onClick={handleClick}>
       <BoardTitle title="Create new board" />
     </BoardCover>
-  );
-};
-
-interface DeleteBoardProps {
-  toggleModal: () => void;
-  handleSubmit: (
-    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
-  ) => void;
-}
-const DeleteBoard = ({ toggleModal, handleSubmit }: DeleteBoardProps) => {
-  return (
-    <form className="mb-3 p-4" onSubmit={handleSubmit}>
-      <h5 className="text-lg leading-normal text-gray-800">
-        Do you want to delete this board and all its content?
-      </h5>
-
-      <div className="mt-10 flex gap-x-3 justify-end">
-        <Button
-          variant="text-black border border-gray-300"
-          handleClick={toggleModal}
-        >
-          <span className="uppercase">cancel</span>
-        </Button>
-        <Button variant="text-white bg-red-500" handleClick={handleSubmit}>
-          <span className="uppercase">delete</span>
-        </Button>
-      </div>
-    </form>
   );
 };
 
@@ -289,10 +262,15 @@ const Board = ({
         isOpen={showDeleteModal}
         handleClick={toggleDeleteModal}
       >
-        <DeleteBoard
+        <Confirm
           toggleModal={toggleDeleteModal}
           handleSubmit={handleDeleteBoard}
-        />
+          name="delete"
+        >
+          <h5 className="text-lg leading-normal text-gray-800">
+            Do you want to delete this board and all its content?
+          </h5>
+        </Confirm>
       </Modal>
 
       <BoardCover bgColor={newBgColor} onClick={handleClick}>

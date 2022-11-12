@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { PlusIcon } from '@heroicons/react/outline';
 import { CreateCard } from '../Create';
 import { TrashIcon } from '@heroicons/react/solid';
-import Button from '../Button';
 import Modal from '../Modal';
 import CardList from '../Card/CardList';
 import { useDeleteList, useEditList } from '../../firebase/firestore/hooks';
+import Confirm from '../Confirm';
 
 interface ListContainerProps {
   children: React.ReactNode;
@@ -64,34 +64,6 @@ const AddList = ({ onClick }: AddListProps) => {
         <span>Add a new list</span>
       </div>
     </div>
-  );
-};
-
-interface DeleteListProps {
-  toggleModal: () => void;
-  handleSubmit: (
-    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
-  ) => void;
-}
-const DeleteList = ({ toggleModal, handleSubmit }: DeleteListProps) => {
-  return (
-    <form className="mb-3 p-4" onSubmit={handleSubmit}>
-      <h5 className="text-lg leading-normal text-gray-800">
-        Do you want to delete this list and all its content?
-      </h5>
-
-      <div className="mt-10 flex gap-x-3 justify-end">
-        <Button
-          variant="text-black border border-gray-300"
-          handleClick={toggleModal}
-        >
-          <span className="uppercase">cancel</span>
-        </Button>
-        <Button variant="bg-red-500 text-white" handleClick={handleSubmit}>
-          <span className="uppercase">delete</span>
-        </Button>
-      </div>
-    </form>
   );
 };
 
@@ -207,7 +179,15 @@ const List = ({
       <CreateCard listId={listId} boardId={boardId} userId={userId} />
 
       <Modal title="Delete List" isOpen={showModal} handleClick={toggleModal}>
-        <DeleteList toggleModal={toggleModal} handleSubmit={handleDeleteList} />
+        <Confirm
+          toggleModal={toggleModal}
+          handleSubmit={handleDeleteList}
+          name="delete"
+        >
+          <h5 className="text-lg leading-normal text-gray-800">
+            Do you want to delete this list and all its content?
+          </h5>
+        </Confirm>
       </Modal>
     </ListContainer>
   );

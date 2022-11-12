@@ -5,6 +5,7 @@ import Button from '../Button';
 import { inputClass } from '../List';
 import Modal from '../Modal';
 import { PlusIcon } from '@heroicons/react/outline';
+import Confirm from '../Confirm';
 
 const defaultCardClass = `form-control block w-full m-0 px-3 py-1.5 text-sm font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out
 focus:text-gray-700 focus:bg-white focus:border-gray-700 focus:outline-none`;
@@ -14,34 +15,6 @@ interface CardContainerProps {
 }
 const CardContainer = ({ children }: CardContainerProps) => {
   return <div className="flex flex-col p-2 overflow-y-auto"> {children}</div>;
-};
-
-interface DeleteCardProps {
-  toggleModal: () => void;
-  handleSubmit: (
-    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
-  ) => void;
-}
-const DeleteCard = ({ toggleModal, handleSubmit }: DeleteCardProps) => {
-  return (
-    <form className="mb-3 p-4" onSubmit={handleSubmit}>
-      <h5 className="text-lg leading-normal text-gray-800">
-        Do you want to delete this ticket?
-      </h5>
-
-      <div className="mt-10 flex gap-x-3 justify-end">
-        <Button
-          variant="text-black border border-gray-300"
-          handleClick={toggleModal}
-        >
-          <span className="uppercase">cancel</span>
-        </Button>
-        <Button variant="bg-red-500 text-white" handleClick={handleSubmit}>
-          <span className="uppercase">delete</span>
-        </Button>
-      </div>
-    </form>
-  );
 };
 
 interface AddCardFormProps {
@@ -179,10 +152,15 @@ const EditCard = ({
         isOpen={showDeleteModal}
         handleClick={toggleDeleteModal}
       >
-        <DeleteCard
+        <Confirm
           toggleModal={toggleDeleteModal}
           handleSubmit={handleDeleteCard}
-        />
+          name="delete"
+        >
+          <h5 className="text-lg leading-normal text-gray-800">
+            Do you want to delete this ticket?
+          </h5>
+        </Confirm>
       </Modal>
     </>
   );
