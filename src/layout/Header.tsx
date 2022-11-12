@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Avatar from '../components/Avatar';
+import Confirm from '../components/Confirm';
+import Modal from '../components/Modal';
 import { deleteUserData } from '../firebase/firestore';
 
 interface HeaderProps {
@@ -9,6 +12,21 @@ interface HeaderProps {
 }
 
 const Header = ({ signOut, user, deleteAuthUser }: HeaderProps) => {
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const toggleLogoutModal = () => {
+    setShowLogoutModal(!showLogoutModal);
+  };
+
+  const isGuest = user?.email === null && user?.displayName === null;
+  const userName = (currentUser: AuthUser) => {
+    if (currentUser.email !== null && currentUser.displayName !== null) {
+      return `${currentUser.displayName.split(' ')[0]}`;
+    } else {
+      return 'Guest';
+    }
+  };
+
   const handleLogout = async () => {
     signOut();
     if (user !== null) {
@@ -30,12 +48,33 @@ const Header = ({ signOut, user, deleteAuthUser }: HeaderProps) => {
           {user && <Avatar user={user} />}
           <button
             className="bg-zinc-700 hover:bg-zinc-900 text-white font-bold py-2 px-4 border border-zinc-700 rounded"
-            onClick={handleLogout}
+            onClick={toggleLogoutModal}
           >
             logout
           </button>
         </div>
       </nav>
+      <Modal
+        title="Logout"
+        isOpen={showLogoutModal}
+        handleClick={toggleLogoutModal}
+      >
+        <Confirm
+          toggleModal={toggleLogoutModal}
+          handleSubmit={handleLogout}
+          name="logout"
+        >
+          <h5 className="text-lg leading-normal text-gray-800">
+            Are you sure you want to logout... {user && userName(user)}?
+          </h5>
+
+          <p className="mt-4 text-base leading-normal text-blue-600">
+            {isGuest
+              ? `Your data will be deleted once you logout.`
+              : `Your data will be saved and will be available on your next login.`}
+          </p>
+        </Confirm>
+      </Modal>
     </header>
   );
 };
