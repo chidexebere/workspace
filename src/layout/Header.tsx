@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Avatar from '../components/Avatar';
 import Confirm from '../components/Confirm';
 import Modal from '../components/Modal';
-import { deleteUserData } from '../firebase/firestore';
+import { useDeleteUserData } from '../firebase/firestore/hooks';
 
 interface HeaderProps {
   signOut: () => void;
@@ -13,6 +13,7 @@ interface HeaderProps {
 
 const Header = ({ signOut, user, deleteAuthUser }: HeaderProps) => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const deleteUserData = useDeleteUserData();
 
   const toggleLogoutModal = () => {
     setShowLogoutModal(!showLogoutModal);
@@ -27,12 +28,12 @@ const Header = ({ signOut, user, deleteAuthUser }: HeaderProps) => {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     signOut();
-    if (user !== null) {
+    if (user) {
       if (user.email === null && user.displayName === null) {
         deleteAuthUser();
-        await deleteUserData(user.uid);
+        deleteUserData.mutate(user.uid);
       }
     }
   };
