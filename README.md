@@ -48,4 +48,5 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 - Tailwind for general styles.
 - Firebase UI for sign-in UI.
 - React Query: for managing server state and React Context for local state
+- @hello-pangea/dnd : used to build drag and drop
 - Eslint for linting and Prettier for code formating
