@@ -32,8 +32,8 @@ const Header = ({ signOut, user, deleteAuthUser }: HeaderProps) => {
     signOut();
     if (user) {
       if (user.email === null && user.displayName === null) {
-        deleteAuthUser();
         deleteUserData.mutate(user.uid);
+        deleteAuthUser();
       }
     }
   };
