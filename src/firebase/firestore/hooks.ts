@@ -14,10 +14,18 @@ import {
   getListsPerBoard,
   dragCardsInSameList,
   dragCardsBetweenList,
+  deleteUserData,
 } from '.';
 
 export const useBoards = (userId: string) => {
   return useQuery<DocumentData[], Error>('boards', () => getBoards(userId));
+};
+
+// Delete user data
+export const useDeleteUserData = () => {
+  return useMutation((userId: string) => {
+    return deleteUserData(userId);
+  });
 };
 
 // Use cached board data
