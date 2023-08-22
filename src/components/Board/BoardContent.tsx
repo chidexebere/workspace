@@ -1,12 +1,12 @@
 import { DragDropContext, DropResult } from '@hello-pangea/dnd';
-import { CreateList } from '../Create';
-import { List } from '../List';
 import {
-  useDragCardsInSameList,
   useDragCardsBetweenList,
+  useDragCardsInSameList,
   useListsPerBoard,
 } from '../../firebase/firestore/hooks';
 import Loading from '../../pages/loading';
+import { List } from '../List';
+import CreateList from '../List/CreateList';
 
 interface Props {
   userId: string;

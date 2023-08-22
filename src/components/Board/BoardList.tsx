@@ -2,7 +2,7 @@ import { Board } from '.';
 import { useBoards } from '../../firebase/firestore/hooks';
 import Loading from '../../pages/loading';
 import Breadcrumb from '../Breadcrumb';
-import { CreateBoard } from '../Create';
+import CreateBoard from './CreateBoard';
 
 interface Props {
   user: AuthUser;
