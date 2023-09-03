@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { AddBoard, EditBoard } from '.';
 import { useAddBoard } from '../../firebase/firestore/hooks';
 import Modal from '../Modal';
+import AddBoard from './AddBoard';
+import EditBoard from './EditBoard';
 
 const CreateBoard = ({ userId }: UserId) => {
   const [showModal, setShowModal] = useState(false);
