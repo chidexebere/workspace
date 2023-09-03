@@ -1,4 +1,3 @@
-import { inputClass } from '../List';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../Button';
@@ -81,7 +80,7 @@ const EditBoard = ({
       <label htmlFor="formInput"></label>
       <input
         type="text"
-        className={`${inputClass} text-gray-700 bg-white`}
+        className="inputClass text-gray-700 bg-white"
         id="formInput"
         placeholder="Enter board title"
         autoFocus={true}

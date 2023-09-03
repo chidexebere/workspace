@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDeleteCard, useEditCard } from '../../firebase/firestore/hooks';
 import Button from '../Button';
-import { inputClass } from '../List';
 import Modal from '../Modal';
 import { PlusIcon } from '@heroicons/react/outline';
 import Confirm from '../Confirm';
@@ -119,7 +118,7 @@ const EditCard = ({
           {showShareLink && (
             <input
               type="text"
-              className={`${inputClass} text-gray-700 bg-white`}
+              className="inputClass text-gray-700 bg-white"
               id="formInput"
               placeholder=""
               autoFocus={true}

@@ -15,8 +15,6 @@ const ListContainer = ({ children }: ListContainerProps) => {
   return <div className="rounded bg-slate-100"> {children}</div>;
 };
 
-const inputClass = `w-48 min-w-full px-3 py-1.5 text-base bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none font-medium`;
-
 interface EditListHeaderProps {
   title: string;
   children?: React.ReactNode;
@@ -37,7 +35,7 @@ const EditListHeader = ({
       <label htmlFor="formInput"></label>
       <input
         type="text"
-        className={`${inputClass} text-gray-700 bg-white`}
+        className="inputClass text-gray-700 bg-white"
         id="formInput"
         placeholder="Add a new list"
         autoFocus={true}
@@ -57,7 +55,7 @@ const AddList = ({ onClick }: AddListProps) => {
   return (
     <div className="mb-3 cursor-pointer">
       <div
-        className={`${inputClass} text-gray-700 bg-white font-light flex gap-x-1 items-center`}
+        className="inputClass text-gray-700 bg-white font-light flex gap-x-1 items-center"
         onClick={onClick}
       >
         <PlusIcon className="h-5 w-5" aria-hidden="true" />
@@ -81,7 +79,7 @@ const ListHeader = ({
 }: ListHeaderProps) => {
   return (
     <div
-      className={`${inputClass} ${bgColor} mb-3 cursor-pointer flex items-center`}
+      className={`inputClass ${bgColor} mb-3 cursor-pointer flex items-center`}
       onClick={handleClick}
     >
       <div className={`text-white grow`}>{title}</div>
@@ -193,4 +191,4 @@ const List = ({
   );
 };
 
-export { AddList, EditListHeader, List, ListContainer, ListHeader, inputClass };
+export { AddList, EditListHeader, List, ListContainer, ListHeader };
