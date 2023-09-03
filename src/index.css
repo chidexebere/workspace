@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
+@layer components {
+  .inputClass {
+    @apply w-full text-sm text-gray-500 bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-500 focus:outline-none font-medium;
+  }
+}
 @tailwind utilities;
