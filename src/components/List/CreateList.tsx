@@ -1,8 +1,9 @@
 import { XIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
 import { useAddList } from '../../firebase/firestore/hooks';
-import { AddList, EditListHeader } from '.';
 import Button from '../Button';
+import { EditListHeader } from './EditListHeader';
+import AddList from './AddList';
 
 interface CreateListProps {
   userId: string;

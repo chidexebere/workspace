@@ -1,11 +1,10 @@
-import { PlusIcon } from '@heroicons/react/outline';
-import { TrashIcon } from '@heroicons/react/solid';
 import { useState } from 'react';
 import { useDeleteList, useEditList } from '../../firebase/firestore/hooks';
 import CardList from '../Card/CardList';
 import CreateCard from '../Card/CreateCard';
 import Confirm from '../Confirm';
 import Modal from '../Modal';
+import { EditListHeader, ListHeader } from './EditListHeader';
 
 interface ListContainerProps {
   children: React.ReactNode;
@@ -13,85 +12,6 @@ interface ListContainerProps {
 
 const ListContainer = ({ children }: ListContainerProps) => {
   return <div className="rounded bg-slate-100"> {children}</div>;
-};
-
-interface EditListHeaderProps {
-  title: string;
-  children?: React.ReactNode;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSubmit?: (
-    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
-  ) => void;
-}
-
-const EditListHeader = ({
-  title,
-  children,
-  onChange,
-  handleSubmit,
-}: EditListHeaderProps) => {
-  return (
-    <form className="mb-3" onSubmit={handleSubmit} onClick={handleSubmit}>
-      <label htmlFor="formInput"></label>
-      <input
-        type="text"
-        className="inputClass text-gray-700 bg-white"
-        id="formInput"
-        placeholder="Add a new list"
-        autoFocus={true}
-        value={title}
-        onChange={onChange}
-      />
-      {children}
-    </form>
-  );
-};
-
-interface AddListProps {
-  onClick: (e: React.MouseEvent) => void;
-}
-
-const AddList = ({ onClick }: AddListProps) => {
-  return (
-    <div className="mb-3 cursor-pointer">
-      <div
-        className="inputClass text-gray-700 bg-white font-light flex gap-x-1 items-center"
-        onClick={onClick}
-      >
-        <PlusIcon className="h-5 w-5" aria-hidden="true" />
-        <span>Add a new list</span>
-      </div>
-    </div>
-  );
-};
-
-interface ListHeaderProps {
-  title: string;
-  bgColor: string;
-  openModal: (e: React.MouseEvent) => void;
-  handleClick: (e: React.MouseEvent) => void;
-}
-const ListHeader = ({
-  title,
-  bgColor,
-  openModal,
-  handleClick,
-}: ListHeaderProps) => {
-  return (
-    <div
-      className={`inputClass ${bgColor} mb-3 cursor-pointer flex items-center`}
-      onClick={handleClick}
-    >
-      <div className={`text-white grow`}>{title}</div>
-      <div className="grow-0">
-        <TrashIcon
-          className="h-5 w-5 text-gray-400 hover:text-gray-50"
-          aria-hidden="true"
-          onClick={openModal}
-        />
-      </div>
-    </div>
-  );
 };
 
 interface ListProps {
@@ -191,4 +111,4 @@ const List = ({
   );
 };
 
-export { AddList, EditListHeader, List, ListContainer, ListHeader };
+export { List, ListContainer };
