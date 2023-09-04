@@ -1,8 +1,8 @@
 import { XIcon } from '@heroicons/react/outline';
 import { useState } from 'react';
 import { useAddCard } from '../../firebase/firestore/hooks';
-import { AddCard, AddCardForm } from '.';
 import Button from '../Button';
+import { AddCard, AddCardForm } from './AddCard';
 
 interface CreateCardProps {
   listId: string;
