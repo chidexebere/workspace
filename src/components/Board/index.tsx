@@ -98,20 +98,16 @@ const Board = ({
     'bg-indigo-500',
   ];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target as HTMLInputElement;
+  const handleInputChange = (value: string) => {
     setInputTitle(value);
   };
 
-  const handleBgColorSelection = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const { value } = e.target as HTMLButtonElement;
+  const handleBgColorSelection = (value: string) => {
     setSelectedBgColor(value);
   };
 
-  const handleEditBoard = (
-    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    e.preventDefault();
+  const handleEditBoard = () => {
+    // e.preventDefault();
     if (inputTitle !== newTitle) {
       editBoard.mutate({
         userId,
@@ -170,7 +166,7 @@ const Board = ({
           onChange={handleInputChange}
           handleBgColorSelection={handleBgColorSelection}
           toggleModal={toggleEditModal}
-          handleSubmit={handleEditBoard}
+          onSubmitHandler={handleEditBoard}
         />
       </Modal>
 

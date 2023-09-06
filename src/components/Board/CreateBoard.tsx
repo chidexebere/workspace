@@ -13,6 +13,8 @@ const CreateBoard = ({ userId }: UserId) => {
 
   const toggleModal = () => {
     setShowModal(!showModal);
+    setTitle('');
+    setBgColor('');
   };
 
   const backgroundColors = [
@@ -22,20 +24,15 @@ const CreateBoard = ({ userId }: UserId) => {
     'bg-indigo-500',
   ];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target as HTMLInputElement;
+  const handleInputChange = (value: string) => {
     setTitle(value);
   };
 
-  const handleBgColorSelection = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const { value } = e.target as HTMLButtonElement;
+  const handleBgColorSelection = (value: string) => {
     setBgColor(value);
   };
 
-  const handleAddBoard = (
-    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    e.preventDefault();
+  const handleAddBoard = () => {
     if (title && bgColor) {
       const newBoard = { userId, title, bgColor };
       addNewBoard.mutate(newBoard);
@@ -55,7 +52,7 @@ const CreateBoard = ({ userId }: UserId) => {
           onChange={handleInputChange}
           handleBgColorSelection={handleBgColorSelection}
           toggleModal={toggleModal}
-          handleSubmit={handleAddBoard}
+          onSubmitHandler={handleAddBoard}
         />
       </Modal>
 
