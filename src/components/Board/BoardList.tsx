@@ -32,9 +32,9 @@ const BoardList = ({ user }: Props) => {
       </Breadcrumb>
 
       <div className="mt-10 flex flex-wrap flex-col gap-y-10 gap-x-6 md:flex-row ">
-        {boards?.map((board) => (
+        {boards?.map((board, index) => (
           <Board
-            key={board.id}
+            key={`${index}${board.id}`}
             bgColor={board.bgColor}
             title={board.title}
             titleTextColor="text-white"
