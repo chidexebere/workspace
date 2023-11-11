@@ -11,7 +11,7 @@ interface ListContainerProps {
 }
 
 const ListContainer = ({ children }: ListContainerProps) => {
-  return <div className="rounded bg-slate-100"> {children}</div>;
+  return <div className="rounded bg-slate-100 mb-10"> {children}</div>;
 };
 
 interface ListProps {
