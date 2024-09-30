@@ -54,9 +54,9 @@ const EditCard = ({
       <form className="mb-2 p-4" onSubmit={handleSubmit}>
         <label htmlFor="formTextarea"></label>
         <textarea
-          className="defaultCardClass"
+          className="defaultCardClass resize-y"
           id="formTextarea"
-          rows={2}
+          rows={4}
           value={textContent}
           placeholder="Enter title for this ticket"
           autoFocus={true}

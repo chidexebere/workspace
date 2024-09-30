@@ -81,6 +81,7 @@ const Card = ({ textContent, cardId, listId, userId }: CardProps) => {
         title="Edit Ticket"
         isOpen={showOpenCardModal}
         handleClick={closeEdit}
+        modalContentWidth="w-4/5 lg:w-1/2"
       >
         <EditCard
           textContent={enteredTextContent}

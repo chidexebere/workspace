@@ -5,9 +5,16 @@ interface Props {
   handleClick: (e: React.MouseEvent) => void;
   title: string;
   children: React.ReactNode;
+  modalContentWidth?: string;
 }
 
-const Modal = ({ isOpen, handleClick, title, children }: Props) => {
+const Modal = ({
+  isOpen,
+  handleClick,
+  title,
+  children,
+  modalContentWidth,
+}: Props) => {
   const defaultClass =
     'grid place-items-center fixed inset-0 z-40 bg-gray-500 bg-opacity-75 transition-opacity';
   const modalClass = isOpen ? `${defaultClass}` : `${defaultClass} hidden`;
@@ -20,7 +27,7 @@ const Modal = ({ isOpen, handleClick, title, children }: Props) => {
       aria-modal="true"
       role="dialog"
     >
-      <div className="relative w-auto pointer-events-none">
+      <div className={`relative pointer-events-none ${modalContentWidth}`}>
         <div className="border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
           <div className="flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
             <h5
